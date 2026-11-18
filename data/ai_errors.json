@@ -1,0 +1,32 @@
+[
+ {
+  "quand": "2026-11-18T21:36:39Z",
+  "où": "describe",
+  "erreur": "min() iterable argument is empty"
+ },
+ {
+  "quand": "2026-11-18T21:37:19Z",
+  "où": "describe",
+  "erreur": "min() iterable argument is empty"
+ },
+ {
+  "quand": "2026-11-18T21:39:24Z",
+  "où": "describe",
+  "erreur": "min() iterable argument is empty"
+ },
+ {
+  "quand": "2026-11-18T21:40:47Z",
+  "où": "describe",
+  "erreur": "min() iterable argument is empty"
+ },
+ {
+  "quand": "2026-11-18T21:42:05Z",
+  "où": "describe",
+  "erreur": "min() iterable argument is empty"
+ },
+ {
+  "quand": "2026-11-18T21:43:11Z",
+  "où": "describe",
+  "erreur": "min() iterable argument is empty"
+ }
+]
