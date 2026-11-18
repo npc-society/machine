@@ -24,6 +24,12 @@ Repérage, tri depuis Discord, montage automatique et compilations. Elle tourne 
 5. **Le dimanche à 18 h**, la compilation « Top 10 de la semaine » est montée à partir de tes clips ⭐. Le lien arrive dans `#montages`.
 6. **Chaque soir**, tu reçois le récap avec le top du jour et les pépites du jour.
 
+## Formats automatiques
+- **Montage automatique :** à chaque repérage, les 2 meilleurs clips par langue sont montés d'office, sans attendre ton ✅ (alternance gros streamer / pépite). Réglage : variable `AUTO_PER_RUN` (0 = désactivé).
+- **Flash info, chaque jour à 18 h 20 :** 3 à 5 brèves de 9 secondes, une par streamer, avec le meilleur moment de chaque clip et un générique « Édition spéciale ». Réglage : `FLASH_SIZE`.
+- **Compil à thème, à la demande :** plein de streamers dans la même situation (le club de strip, la première voiture volée…). Lance **Run workflow**, choisis l'action `theme`, puis remplis les mots-clés (`strip,club`), le titre (`ILS DÉCOUVRENT LE CLUB DE STRIP`) et la chaîne (`fr`, `en` ou `es`). Chaque soir, le récap te suggère les thèmes qui reviennent chez plusieurs streamers.
+- **Compilation de la semaine, le dimanche :** à partir de tes clips ⭐.
+
 ## Installation (environ 30 minutes, une seule fois)
 
 ### 1. Twitch

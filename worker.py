@@ -8,6 +8,8 @@ Commandes :
   python worker.py check        -> lit les réactions, prépare la file de montage (rapide)
   python worker.py render       -> monte les shorts en attente et les envoie dans #montages-<langue>
   python worker.py compil [fr]  -> compilation de la semaine avec les clips ⭐
+  python worker.py flash [fr]   -> flash info du jour (brèves des meilleurs moments)
+  python worker.py theme fr "strip,club" "ILS DÉCOUVRENT LE CLUB"  -> compil à thème
 """
 import os
 import shutil
@@ -35,10 +37,14 @@ def other_langs(lang):
     return [l for l in C.LANGS if l != lang]
 
 
-def enqueue(queue, clip_id, lang):
+def enqueue(queue, clip_id, lang, db=None, force=False):
+    """Ajoute un montage à la file, sauf s'il est déjà prévu ou déjà fait (sauf 🔁 = force)."""
     item = {"clip": clip_id, "lang": lang}
-    if item not in queue:
-        queue.append(item)
+    clip = (db or {}).get(clip_id, {})
+    if item in queue or (not force and lang in clip.get("rendered", [])):
+        return False
+    queue.append(item)
+    return True
 
 
 def check():
@@ -61,11 +67,11 @@ def check():
                 elif picks:
                     clip["status"] = "traite"
                     if "garder" in picks:
-                        enqueue(queue, clip["id"], clip["lang"])
+                        enqueue(queue, clip["id"], clip["lang"], db)
                     if "croise" in picks:
                         clip["cross"] = True
                         for l in other_langs(clip["lang"]):
-                            enqueue(queue, clip["id"], l)
+                            enqueue(queue, clip["id"], l, db)
                     if "compil" in picks:
                         clip["compil"] = True
             m = by_mont.get(msg["id"])
@@ -80,7 +86,7 @@ def check():
                     c = db.get(m["clip_id"])
                     if c:
                         c["reroll"] = c.get("reroll", 0) + 1
-                        enqueue(queue, m["clip_id"], m["lang"])
+                        enqueue(queue, m["clip_id"], m["lang"], db, force=True)
 
     C.save_json(DB_FILE, db)
     C.save_json(QUEUE_FILE, queue)
@@ -120,6 +126,9 @@ def render():
                 "clip_id": clip["id"], "lang": out_lang, "status": "a_valider",
                 "message_id": msg["id"] if msg else None, "title": txt["title"], "caption": txt["caption"],
                 "category": r["category"], "made_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+            clip.setdefault("rendered", [])
+            if out_lang not in clip["rendered"]:
+                clip["rendered"].append(out_lang)
             done.append(item)
         except Exception as e:
             print(f"⚠️ Échec du montage {clip['url']} ({out_lang}) : {e}")
@@ -165,6 +174,91 @@ def compil(lang):
     C.save_json(DB_FILE, db)
 
 
+def publish_video(path: Path, lang: str, header: str, label: str):
+    """Envoie dans Discord si ça tient (< 10 Mo), sinon dépose dans les Releases GitHub et poste le lien."""
+    ch = C.channel("MONTAGES", lang)
+    if path.stat().st_size <= C.DISCORD_MAX_MB * 1024 * 1024:
+        if ch:
+            msg = D.send(ch, header, file=path)
+            D.add_buttons(ch, msg["id"], D.VALIDATE)
+        return
+    tag = f"{label}-{lang}-{datetime.now(timezone.utc):%Y%m%d-%H%M}"
+    link = ""
+    try:
+        subprocess.run(["gh", "release", "create", tag, str(path), "--title", tag,
+                        "--notes", "Vidéo générée automatiquement"], check=True)
+        link = f"https://github.com/{os.environ.get('GITHUB_REPOSITORY', '')}/releases/tag/{tag}"
+    except Exception as e:
+        print(f"⚠️ Envoi dans les Releases impossible : {e}")
+    if ch:
+        D.send(ch, f"{header}\n{link}")
+
+
+def flash(lang):
+    """Flash info du jour : les meilleurs moments de 3-5 streamers différents, en brèves."""
+    import montage
+    db = C.load_json(DB_FILE)
+    now = datetime.now(timezone.utc)
+    pool = [c for c in db.values() if (c["lang"] == lang or c.get("cross")) and c["status"] != "jete"
+            and not c.get(f"flash_fait_{lang}")
+            and (now - datetime.strptime(c["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)).days < 2]
+    picks, seen = [], set()
+    for c in sorted(pool, key=lambda c: c["views"], reverse=True):
+        if c["streamer"] not in seen:
+            picks.append(c)
+            seen.add(c["streamer"])
+        if len(picks) >= C.FLASH_SIZE:
+            break
+    if len(picks) < 3:
+        print(f"[{lang}] pas assez de clips pour un flash ({len(picks)})")
+        return
+    title = {"fr": "FLASH INFO", "es": "AVANCE INFORMATIVO"}.get(lang, "NEWS FLASH")
+    path = montage.render_flash(picks, title, C.OUT / f"flash_{lang}", lang, target_mb=C.DISCORD_MAX_MB)
+    credits = ", ".join(c["streamer"] for c in picks)
+    publish_video(path, lang, f"📺 **{title}** ({len(picks)} brèves) · Crédits : {credits}\n"
+                              f"✅ valider · 🔁 refaire · ❌ jeter", "flash")
+    for c in picks:
+        c[f"flash_fait_{lang}"] = True
+    C.save_json(DB_FILE, db)
+
+
+def theme(lang, keywords, title, days=7):
+    """Compil à thème : plein de streamers dans la même situation (ex. « strip », « première voiture »)."""
+    import hunter
+    import montage
+    from categorize import _norm
+    kws = [_norm(k.strip()) for k in keywords.split(",") if k.strip()]
+    token = hunter.get_token()
+    now = datetime.now(timezone.utc)
+    found = []
+    for gid in hunter.find_game_ids(token):
+        found += hunter.paginate(token, "clips", {
+            "game_id": gid, "started_at": (now - __import__("datetime").timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "ended_at": now.strftime("%Y-%m-%dT%H:%M:%SZ")}, C.CLIP_PAGES * 2)
+    match = [c for c in found if c.get("duration", 99) <= C.MAX_CLIP_SECONDS
+             and any(k in _norm(c["title"]) for k in kws)
+             and (c.get("language") == lang or C.env("THEME_ALL_LANGS", "1") == "1")]
+    picks, seen = [], set()
+    for c in sorted(match, key=lambda c: c["view_count"], reverse=True):
+        if c["broadcaster_id"] in seen:
+            continue
+        seen.add(c["broadcaster_id"])
+        picks.append({"id": c["id"], "lang": c.get("language", lang), "title": c["title"], "url": c["url"],
+                      "streamer": c["broadcaster_name"], "views": c["view_count"]})
+        if len(picks) >= C.THEME_SIZE:
+            break
+    ch = C.channel("MONTAGES", lang)
+    if len(picks) < 3:
+        msg = f"🔎 Thème « {keywords} » : seulement {len(picks)} clip(s) trouvé(s) sur {days} jours, compil annulée."
+        print(msg)
+        if ch:
+            D.send(ch, msg)
+        return
+    path = montage.render_compilation(picks, title, C.OUT / f"theme_{lang}", out_lang=lang)
+    credits = ", ".join(c["streamer"] for c in picks)
+    publish_video(path, lang, f"🎬 **{title}** ({len(picks)} streamers) · Crédits : {credits}", "theme")
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "check"
     if cmd == "check":
@@ -174,3 +268,8 @@ if __name__ == "__main__":
     elif cmd == "compil":
         for lang in (sys.argv[2:] or C.LANGS):
             compil(lang)
+    elif cmd == "flash":
+        for lang in (sys.argv[2:] or C.LANGS):
+            flash(lang)
+    elif cmd == "theme":  # python worker.py theme fr "strip,club" "ILS DÉCOUVRENT LE CLUB DE STRIP"
+        theme(sys.argv[2], sys.argv[3], sys.argv[4])

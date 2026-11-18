@@ -217,7 +217,7 @@ def game_y(layout: str) -> int:
     return CAM_Y + CAM_H + 20 if layout == "facecam" else 620
 
 
-def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, layout, rank=None):
+def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, layout, rank=None, brief=None):
     b = C.BRAND
     end = ts(dur)
     ev = []
@@ -229,6 +229,9 @@ def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, la
     hy = 172
     ev.append(f"Dialogue: 5,0:00:00.05,{end},Head,,0,0,0,,{{\\move(-1100,{hy},36,{hy},0,220)}}"
               f"{ass_text(txt['headline'])}")
+    if brief:  # flash info : « BRÈVE 2/4 » en haut à droite
+        word = {"fr": "BRÈVE", "es": "BREVE"}.get(lang, "BRIEF")
+        ev.append(f"Dialogue: 6,0:00:00.00,{end},Kicker,,0,0,0,,{{\\an9\\pos({W - 36},52)}}{word} {brief[0]}/{brief[1]}")
     if rank is not None:
         ev.append(f"Dialogue: 6,0:00:00.00,{ts(min(dur, 3))},Rank,,0,0,0,,"
                   f"{{\\pos(540,{gy + GAME_H // 2})\\fscx40\\fscy40\\t(0,160,\\fscx110\\fscy110)"
@@ -380,7 +383,8 @@ def encode(src: Path, out: Path, info, cam, peaks, ass_path, sfx: Path, sfx_at, 
     return out
 
 
-def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = None, out_lang=None) -> dict:
+def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = None, out_lang=None,
+                 brief=None) -> dict:
     """Monte un clip. out_lang = langue de la chaîne cible (sous-titres traduits si elle diffère du clip)."""
     import texts
     lang = clip["lang"]
@@ -411,7 +415,7 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
     peak = peaks[0] if peaks else (info["dur"] * 0.6 if info["dur"] > 4 else None)
     ass_path = work / f"{clip['id']}_{out_lang}.ass"
     build_ass(ass_path, words, info["dur"], txt, meme["stamp"], peak, clip["streamer"], out_lang, seed,
-              layout, rank=rank)
+              layout, rank=rank, brief=brief)
     sfx = None
     if meme["sfx"]:
         for ext in (".wav", ".mp3"):
@@ -471,3 +475,53 @@ def render_compilation(clips: list, title: str, work: Path, out_lang: str = None
          "-c:v", "libx264", "-preset", "veryfast", "-crf", "22", "-pix_fmt", "yuv420p", "-r", str(FPS),
          "-c:a", "aac", "-b:a", "160k", "-ar", "44100", "-movflags", "+faststart", str(out)])
     return out
+
+
+def trim_best(src: Path, out: Path, seconds: float = 9.0) -> Path:
+    """Garde le meilleur moment du clip (autour du pic audio) pour les brèves."""
+    info = probe(src)
+    if info["dur"] <= seconds + 1:
+        return src
+    peaks = audio_peaks(src, info["dur"]) if info["audio"] else []
+    p = peaks[0] if peaks else info["dur"] * 0.6
+    start = min(max(p - seconds * 0.55, 0), info["dur"] - seconds)
+    run(["ffmpeg", "-y", "-v", "error", "-ss", f"{start:.2f}", "-i", str(src), "-t", str(seconds),
+         "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", "-c:a", "aac", "-b:a", "192k", str(out)])
+    return out
+
+
+def concat(parts: list, out: Path, target_mb=None) -> Path:
+    """Assemble plusieurs vidéos ; si target_mb, compresse pour tenir dans Discord."""
+    lst = out.with_suffix(".txt")
+    lst.write_text("".join(f"file '{Path(p).resolve()}'\n" for p in parts), encoding="utf-8")
+    cmd = ["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst),
+           "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p", "-r", str(FPS),
+           "-c:a", "aac", "-b:a", "128k", "-ar", "44100", "-ac", "2", "-movflags", "+faststart"]
+    if target_mb:
+        dur = sum(probe(Path(p))["dur"] for p in parts)
+        kbps = int(min(6000, max(700, target_mb * 8192 * 0.88 / dur - 128)))
+        cmd += ["-b:v", f"{kbps}k", "-maxrate", f"{int(kbps * 1.25)}k", "-bufsize", f"{kbps * 2}k"]
+    else:
+        cmd += ["-crf", "22"]
+    run(cmd + [str(out)])
+    if target_mb and out.stat().st_size > target_mb * 1024 * 1024:
+        return concat(parts, out, target_mb * 0.8)
+    return out
+
+
+def render_flash(clips: list, title: str, work: Path, lang: str, target_mb=None) -> Path:
+    """Flash info : générique + 3 à 5 brèves courtes (le meilleur moment de chaque clip)."""
+    work.mkdir(parents=True, exist_ok=True)
+    parts = [render_intro(title, lang, work)]
+    n = len(clips)
+    for i, clip in enumerate(clips, 1):
+        try:
+            w = work / clip["id"]
+            w.mkdir(parents=True, exist_ok=True)
+            full = download(clip["url"], w / "full.mp4")
+            short = trim_best(full, w / "best.mp4")
+            r = render_short(clip, w, target_mb=None, src=short, out_lang=lang, brief=(i, n))
+            parts.append(r["path"])
+        except Exception as e:
+            print(f"⚠️ Brève ignorée ({clip['url']}) : {e}")
+    return concat(parts, work / "flash.mp4", target_mb)

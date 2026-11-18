@@ -11,7 +11,30 @@ import requests
 
 import config as C
 import discord_api as D
-from categorize import CATEGORIES, categorize
+import worker as W
+from categorize import CATEGORIES, _norm, categorize
+
+STOP = set("""gta gta6 gtavi vi six the and for with this that what when your from just have like they them
+then than into over very more most only also some been were will would could there their here dans pour avec
+cette mais plus tout tous elle elles nous vous leur leurs sont etait comme quand quoi sans sous entre apres avant
+bien trop faire fait part chez para como pero esta este todo todos cuando donde porque muy mas sobre entre desde
+hasta clip stream live twitch moment moments best first""".split())
+
+
+def theme_ideas(pool, min_streamers=4, top=5):
+    """Mots qui reviennent dans les titres de clips de plusieurs streamers = idée de compil à thème."""
+    import re
+    by_word = {}
+    for c in pool:
+        words = [w for w in re.findall(r"[a-z0-9]+", _norm(c["title"])) if len(w) >= 4 and w not in STOP]
+        grams = set(words) | {f"{a} {b}" for a, b in zip(words, words[1:])}
+        for g in grams:
+            d = by_word.setdefault(g, [set(), 0])
+            d[0].add(c["broadcaster_id"])
+            d[1] += 1
+    ideas = [(w, len(s), n) for w, (s, n) in by_word.items() if len(s) >= min_streamers]
+    ideas.sort(key=lambda x: (x[1], x[2], " " in x[0]), reverse=True)
+    return ideas[:top]
 
 API = "https://api.twitch.tv/helix"
 DB_FILE = C.DATA / "clips_db.json"
@@ -129,13 +152,16 @@ def clip_embed(c, now, rank_label=""):
     }
 
 
-def propose(c, lang, now, db):
+def propose(c, lang, now, db, auto=False):
     ch = C.channel("CLIPS", lang)
     if not ch or not C.DISCORD_TOKEN:
         print(f"[{lang}] salon Discord non configuré, clip archivé seulement : {c['title']}")
         msg = None
     else:
-        msg = D.send(ch, embeds=[clip_embed(c, now)])
+        emb = clip_embed(c, now)
+        if auto:
+            emb["footer"]["text"] = "🤖 Montage automatique lancé · " + emb["footer"]["text"]
+        msg = D.send(ch, embeds=[emb])
         D.add_buttons(ch, msg["id"])
     db[c["id"]] = {
         "id": c["id"], "lang": lang, "title": c["title"], "url": c["url"], "created_at": c["created_at"],
@@ -156,6 +182,7 @@ def run(mode="hunt"):
     games = find_game_ids(token)
     streamers = C.load_json(STREAMERS_FILE)
     db = C.load_json(DB_FILE)
+    queue = C.load_json(W.QUEUE_FILE, default=[])
 
     window = timedelta(hours=6) if mode == "hunt" else timedelta(hours=24)
     clips = []
@@ -191,8 +218,13 @@ def run(mode="hunt"):
                          reverse=True)[:C.PER_RUN_BIG]
             small = sorted((c for c in small if c["id"] not in db), key=buzz_ratio,
                            reverse=True)[:C.PER_RUN_SMALL]
+            # Montage automatique des meilleurs (alternance gros / pépite), sans attendre ton ✅
+            interleaved = [x for pair in zip(big, small) for x in pair] + big[len(small):] + small[len(big):]
+            auto_ids = {c["id"] for c in interleaved[:C.AUTO_PER_RUN]}
             for c in big + small:
-                propose(c, lang, now, db)
+                propose(c, lang, now, db, auto=c["id"] in auto_ids)
+                if c["id"] in auto_ids:
+                    W.enqueue(queue, c["id"], lang, db)
                 if c["broadcaster_id"] in streamers:
                     streamers[c["broadcaster_id"]]["clips_retenus"] += 1
             print(f"[{lang}] {len(big)} gros + {len(small)} pépites proposés")
@@ -200,6 +232,11 @@ def run(mode="hunt"):
             ch = C.channel("CLIPS", lang)
             top = sorted(big, key=lambda c: c["view_count"], reverse=True)[:C.DAILY_BIG]
             gems = sorted(small, key=buzz_ratio, reverse=True)[:C.DAILY_SMALL]
+            ideas = theme_ideas(pool)
+            if ch and C.DISCORD_TOKEN and ideas:
+                lines = "\n".join(f"• **{w}** — {n} streamers, {k} clips" for w, n, k in ideas)
+                D.send(ch, f"💡 **Idées de compils à thème** (ce qui revient chez plusieurs streamers aujourd'hui)\n"
+                           f"{lines}\nPour en lancer une : Run workflow → action `theme` + le mot-clé.")
             if ch and C.DISCORD_TOKEN:
                 flag = C.FLAGS.get(lang, lang.upper())
                 for header, lst in ((f"{flag} ⭐ **TOP {len(top)} DU JOUR** — {now:%d/%m}", top),
@@ -213,6 +250,7 @@ def run(mode="hunt"):
     cutoff = now - timedelta(days=10)
     db = {k: v for k, v in db.items() if parse_ts(v["created_at"]) > cutoff or v.get("compil")}
     C.save_json(DB_FILE, db)
+    C.save_json(W.QUEUE_FILE, queue)
     C.save_json(STREAMERS_FILE, streamers)
     export_streamers_csv(streamers)
 

@@ -5,13 +5,23 @@ on:
     - cron: "7,37 * * * *"   # toutes les 30 min : lit tes réactions, monte les shorts (+ repérage à :07)
     - cron: "45 21 * * *"    # 22h45 (heure d'hiver de Paris) : récap du jour
     - cron: "0 17 * * 0"     # dimanche 18h : compilation de la semaine
+    - cron: "20 17 * * *"    # 18h20 : flash info du jour (brèves)
   workflow_dispatch:
     inputs:
       action:
-        description: "hunt = repérer · render = monter · compil = compilation"
+        description: "hunt = repérer · render = monter · compil = compil ⭐ · flash = flash info · theme = compil à thème"
         default: "hunt"
         type: choice
-        options: [hunt, render, compil]
+        options: [hunt, render, compil, flash, theme]
+      theme_keywords:
+        description: "Thème : mots-clés séparés par des virgules (ex. strip,club,danseuse)"
+        default: ""
+      theme_title:
+        description: "Thème : titre de la vidéo (ex. ILS DÉCOUVRENT LE CLUB DE STRIP)"
+        default: ""
+      theme_lang:
+        description: "Thème : chaîne (fr, en, es)"
+        default: "fr"
 
 permissions:
   contents: write
@@ -43,7 +53,7 @@ env:
 jobs:
   machine:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -59,13 +69,20 @@ jobs:
         run: |
           S="${{ github.event.schedule }}"
           A="${{ github.event.inputs.action }}"
-          HUNT=none; COMPIL=false
+          HUNT=none; COMPIL=false; FLASH=false; THEME=false
           if [ "$S" = "45 21 * * *" ]; then HUNT=daily
           elif [ "$S" = "0 17 * * 0" ] || [ "$A" = "compil" ]; then COMPIL=true
-          elif [ "$A" = "hunt" ] || [ "$(date -u +%M)" -lt 30 ]; then HUNT=hunt
+          elif [ "$S" = "20 17 * * *" ] || [ "$A" = "flash" ]; then FLASH=true
+          elif [ "$A" = "theme" ]; then THEME=true
+          elif [ "$A" = "hunt" ] || { [ -z "$A" ] && [ "$(date -u +%M)" -lt 30 ]; }; then HUNT=hunt
           fi
+          HEAVY=false
+          if [ "$COMPIL" = true ] || [ "$FLASH" = true ] || [ "$THEME" = true ]; then HEAVY=true; fi
           echo "hunt=$HUNT" >> "$GITHUB_OUTPUT"
           echo "compil=$COMPIL" >> "$GITHUB_OUTPUT"
+          echo "flash=$FLASH" >> "$GITHUB_OUTPUT"
+          echo "theme=$THEME" >> "$GITHUB_OUTPUT"
+          echo "heavy=$HEAVY" >> "$GITHUB_OUTPUT"
 
       - name: Repérage des clips
         if: steps.plan.outputs.hunt != 'none'
@@ -76,13 +93,13 @@ jobs:
         run: python worker.py check
 
       - name: Outils de montage
-        if: steps.check.outputs.queue != '0' || steps.plan.outputs.compil == 'true'
+        if: steps.check.outputs.queue != '0' || steps.plan.outputs.heavy == 'true'
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           pip install faster-whisper yt-dlp "opencv-python-headless<5" numpy
 
       - name: Cache du modèle Whisper
-        if: steps.check.outputs.queue != '0' || steps.plan.outputs.compil == 'true'
+        if: steps.check.outputs.queue != '0' || steps.plan.outputs.heavy == 'true'
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
@@ -95,6 +112,18 @@ jobs:
       - name: Compilation de la semaine
         if: steps.plan.outputs.compil == 'true'
         run: python worker.py compil
+
+      - name: Flash info du jour
+        if: steps.plan.outputs.flash == 'true'
+        run: python worker.py flash
+
+      - name: Compil à thème
+        if: steps.plan.outputs.theme == 'true'
+        env:
+          KW: ${{ github.event.inputs.theme_keywords }}
+          TITLE: ${{ github.event.inputs.theme_title }}
+          TLANG: ${{ github.event.inputs.theme_lang }}
+        run: python worker.py theme "$TLANG" "$KW" "${TITLE:-$KW}"
 
       - name: Sauvegarde
         if: always()
