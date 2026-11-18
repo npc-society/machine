@@ -37,12 +37,20 @@ def other_langs(lang):
     return [l for l in C.LANGS if l != lang]
 
 
-def enqueue(queue, clip_id, lang, db=None, force=False):
-    """Ajoute un montage à la file, sauf s'il est déjà prévu ou déjà fait (sauf 🔁 = force)."""
-    item = {"clip": clip_id, "lang": lang}
+def enqueue(queue, clip_id, lang, db=None, force=False, auto=False):
+    """Ajoute un montage à la file, sauf s'il est déjà prévu ou déjà fait (sauf 🔁 = force).
+    auto=True : choisi par la machine (sera filtré par la note IA) ; un ✅ de ta part retire ce filtre."""
     clip = (db or {}).get(clip_id, {})
-    if item in queue or (not force and lang in clip.get("rendered", [])):
+    for q in queue:
+        if q["clip"] == clip_id and q["lang"] == lang:
+            if not auto:
+                q.pop("auto", None)
+            return False
+    if not force and lang in clip.get("rendered", []):
         return False
+    item = {"clip": clip_id, "lang": lang}
+    if auto:
+        item["auto"] = True
     queue.append(item)
     return True
 
@@ -97,6 +105,7 @@ def check():
 
 def render():
     import montage
+    import texts
     db = C.load_json(DB_FILE)
     queue = C.load_json(QUEUE_FILE, default=[])
     montages = C.load_json(MONTAGES_FILE)
@@ -111,6 +120,13 @@ def render():
         try:
             r = montage.render_short(clip, work, target_mb=C.DISCORD_MAX_MB, out_lang=out_lang)
             txt = r["texts"]
+            if item.get("auto"):  # tri automatique : on ne garde que les clips drôles ou intéressants
+                note = texts.rate_clip(clip, r["transcript"], r["category"])
+                if note and (note["score"] < C.AUTO_MIN_SCORE or not note["safe"]):
+                    print(f"[auto] écarté {clip['url']} : {note}")
+                    clip["auto_ecarte"] = note
+                    done.append(item)
+                    continue
             ch = C.channel("MONTAGES", out_lang)
             cross = f"🌍 Clip {clip['lang'].upper()} sous-titré en {out_lang.upper()}\n" if out_lang != clip["lang"] else ""
             if out_lang != clip["lang"] and not r["translated"]:
@@ -129,6 +145,14 @@ def render():
             clip.setdefault("rendered", [])
             if out_lang not in clip["rendered"]:
                 clip["rendered"].append(out_lang)
+            done.append(item)
+        except montage.UnsafeClip as e:
+            print(f"🔞 Écarté {clip['url']} : {e}")
+            clip["status"] = "bloque"
+            clip["bloque"] = str(e)
+            ch = C.channel("MONTAGES", out_lang)
+            if ch and not item.get("auto"):
+                D.send(ch, f"🔞 Clip écarté automatiquement ({e}) : {clip['title']} — {clip['streamer']}")
             done.append(item)
         except Exception as e:
             print(f"⚠️ Échec du montage {clip['url']} ({out_lang}) : {e}")

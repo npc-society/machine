@@ -53,7 +53,10 @@ CLIP_PAGES = env_int("CLIP_PAGES", 20)
 # --- Montage
 MAX_RENDERS_PER_RUN = env_int("MAX_RENDERS_PER_RUN", 10)
 AUTO_PER_RUN = env_int("AUTO_PER_RUN", 2)          # clips montés d'office à chaque repérage, par langue
-FLASH_SIZE = env_int("FLASH_SIZE", 4)              # nombre de brèves dans un flash info
+FLASH_SIZE = env_int("FLASH_SIZE", 3)              # nombre de brèves dans un flash info
+FLASH_SECONDS = env_int("FLASH_SECONDS", 15)       # durée de chaque brève
+MIN_CLIP_SECONDS = env_int("MIN_CLIP_SECONDS", 15)  # on ignore les clips trop courts
+AUTO_MIN_SCORE = env_int("AUTO_MIN_SCORE", 6)      # note IA minimale (sur 10) pour un montage auto
 THEME_SIZE = env_int("THEME_SIZE", 8)              # nombre de clips dans une compil à thème
 MAX_CLIP_SECONDS = env_int("MAX_CLIP_SECONDS", 60)
 WHISPER_MODEL = env("WHISPER_MODEL", "small")

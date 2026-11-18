@@ -24,9 +24,14 @@ Repérage, tri depuis Discord, montage automatique et compilations. Elle tourne 
 5. **Le dimanche à 18 h**, la compilation « Top 10 de la semaine » est montée à partir de tes clips ⭐. Le lien arrive dans `#montages`.
 6. **Chaque soir**, tu reçois le récap avec le top du jour et les pépites du jour.
 
+## Tri automatique
+- **Clips trop courts ignorés** : moins de 15 s (variable `MIN_CLIP_SECONDS`).
+- **Nudité** : chaque clip est analysé image par image (NudeNet). En cas de nudité, il est écarté et rien n'est monté.
+- **Montages automatiques notés par l'IA** (avec `ANTHROPIC_API_KEY`) : seuls les clips jugés drôles ou intéressants (note ≥ `AUTO_MIN_SCORE`, 6/10 par défaut) et publiables sont envoyés. Tes ✅ manuels passent toujours.
+
 ## Formats automatiques
 - **Montage automatique :** à chaque repérage, les 2 meilleurs clips par langue sont montés d'office, sans attendre ton ✅ (alternance gros streamer / pépite). Réglage : variable `AUTO_PER_RUN` (0 = désactivé).
-- **Flash info, chaque jour à 18 h 20 :** 3 à 5 brèves de 9 secondes, une par streamer, avec le meilleur moment de chaque clip et un générique « Édition spéciale ». Réglage : `FLASH_SIZE`.
+- **Flash info, chaque jour à 18 h 20 :** 3 brèves de 15 secondes (variables `FLASH_SIZE`, `FLASH_SECONDS`), enchaînées façon zapping télé, une par streamer, avec le meilleur moment de chaque clip et un générique « Édition spéciale ». Réglage : `FLASH_SIZE`.
 - **Compil à thème, à la demande :** plein de streamers dans la même situation (le club de strip, la première voiture volée…). Lance **Run workflow**, choisis l'action `theme`, puis remplis les mots-clés (`strip,club`), le titre (`ILS DÉCOUVRENT LE CLUB DE STRIP`) et la chaîne (`fr`, `en` ou `es`). Chaque soir, le récap te suggère les thèmes qui reviennent chez plusieurs streamers.
 - **Compilation de la semaine, le dimanche :** à partir de tes clips ⭐.
 

@@ -96,7 +96,7 @@ jobs:
         if: steps.check.outputs.queue != '0' || steps.plan.outputs.heavy == 'true'
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          pip install faster-whisper yt-dlp "opencv-python-headless<5" numpy
+          pip install faster-whisper yt-dlp "opencv-python-headless<5" numpy nudenet
 
       - name: Cache du modèle Whisper
         if: steps.check.outputs.queue != '0' || steps.plan.outputs.heavy == 'true'

@@ -200,7 +200,7 @@ def run(mode="hunt"):
     for lang in C.LANGS:
         pool = []
         for c in clips:
-            if c.get("language") != lang or c["duration"] > C.MAX_CLIP_SECONDS:
+            if c.get("language") != lang or not (C.MIN_CLIP_SECONDS <= c["duration"] <= C.MAX_CLIP_SECONDS):
                 continue
             s = streamers.get(c["broadcaster_id"])
             c["_viewers"] = s["max_viewers"] if s else None
@@ -224,7 +224,7 @@ def run(mode="hunt"):
             for c in big + small:
                 propose(c, lang, now, db, auto=c["id"] in auto_ids)
                 if c["id"] in auto_ids:
-                    W.enqueue(queue, c["id"], lang, db)
+                    W.enqueue(queue, c["id"], lang, db, auto=True)
                 if c["broadcaster_id"] in streamers:
                     streamers[c["broadcaster_id"]]["clips_retenus"] += 1
             print(f"[{lang}] {len(big)} gros + {len(small)} pépites proposés")

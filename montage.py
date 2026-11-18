@@ -130,6 +130,35 @@ def audio_peaks(path: Path, dur: float, max_peaks: int = 3) -> list:
     return peaks
 
 
+class UnsafeClip(Exception):
+    """Clip écarté automatiquement (nudité détectée)."""
+
+
+NSFW_CLASSES = {"FEMALE_BREAST_EXPOSED", "FEMALE_GENITALIA_EXPOSED", "MALE_GENITALIA_EXPOSED",
+                "BUTTOCKS_EXPOSED", "ANUS_EXPOSED"}
+
+
+def nsfw_check(src: Path, work: Path, frames: int = 10, threshold: float = 0.45):
+    """Analyse quelques images du clip avec NudeNet. Renvoie (ok, détail)."""
+    try:
+        from nudenet import NudeDetector
+    except ImportError:
+        print("⚠️ NudeNet absent : contrôle de nudité désactivé")
+        return True, ""
+    info = probe(src)
+    fdir = work / "frames"
+    fdir.mkdir(parents=True, exist_ok=True)
+    run(["ffmpeg", "-y", "-v", "error", "-i", str(src), "-vf", f"fps={frames / max(info['dur'], 1):.4f},scale=960:-2",
+         "-frames:v", str(frames), str(fdir / "f%02d.jpg")])
+    det = NudeDetector()
+    hits = []
+    for f in sorted(fdir.glob("*.jpg")):
+        for d in det.detect(str(f)):
+            if d.get("class") in NSFW_CLASSES and d.get("score", 0) >= threshold:
+                hits.append(d["class"])
+    return (len(hits) < 2), ", ".join(sorted(set(hits)))  # 2 détections minimum pour éviter les faux positifs
+
+
 def detect_facecam(path: Path, info: dict):
     """Cherche une facecam stable dans un coin. Renvoie (x, y, w, h) en pixels, ou None."""
     try:
@@ -195,7 +224,7 @@ WrapStyle: 0
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Head,Barlow Condensed ExtraBold,104,{blk},{wht},{yel},&H00000000,0,0,0,0,100,100,0,0,3,12,0,7,36,60,0,1
-Style: Stamp,Archivo Black,86,{wht},{wht},{red},&H00000000,0,0,0,0,100,100,1,0,3,20,0,5,60,60,0,1
+Style: Stamp,Archivo Black,54,{wht},{wht},{red},&H00000000,0,0,0,0,100,100,1,0,3,14,0,9,60,60,0,1
 Style: Chyron,Barlow Condensed ExtraBold,46,{wht},{wht},{blk},&H00000000,0,0,0,0,100,100,1,0,3,11,0,7,0,0,0,1
 Style: Ticker,Barlow Condensed ExtraBold,46,{wht},{wht},&H00000000,&H00000000,0,0,0,0,100,100,1,0,1,0,0,4,0,0,0,1
 Style: TickLbl,Barlow Condensed ExtraBold,46,{blk},{wht},{yel},&H00000000,0,0,0,0,100,100,1,0,3,14,0,4,0,0,0,1
@@ -268,16 +297,14 @@ def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, la
     for i, ch in enumerate(chunks):
         start = ch[0][0]
         stop = min(ch[-1][1] + 0.25, chunks[i + 1][0][0] if i + 1 < len(chunks) else dur)
-        if stamp and peak is not None and start < peak + 1.8 and stop > peak:
-            continue  # on laisse la place au tampon
         ev.append(f"Dialogue: 2,{ts(start)},{ts(stop)},Caption,,0,0,{margin_v},,{pop}"
                   f"{ass_text(' '.join(x[2] for x in ch))}")
 
-    # Tampon de presse au moment fort, au centre du clip
+    # Tampon de presse au moment fort : petit autocollant dans le coin du clip (ne cache pas l'action)
     if stamp and peak is not None:
-        anim = (f"{{\\pos(540,{gy + GAME_H // 2})\\frz6\\fscx260\\fscy260\\alpha&HFF&"
+        anim = (f"{{\\an9\\pos({W - 28},{gy + 22})\\frz-4\\fscx180\\fscy180\\alpha&HFF&"
                 f"\\t(0,140,\\fscx100\\fscy100\\alpha&H00&)}}")
-        ev.append(f"Dialogue: 7,{ts(peak)},{ts(min(peak + 1.8, dur))},Stamp,,0,0,0,,{anim}{ass_text(stamp)}")
+        ev.append(f"Dialogue: 7,{ts(peak)},{ts(min(peak + 2.2, dur))},Stamp,,0,0,0,,{anim}{ass_text(stamp)}")
     path.write_text(ass_header() + "\n".join(ev) + "\n", encoding="utf-8")
 
 
@@ -316,8 +343,13 @@ def encode(src: Path, out: Path, info, cam, peaks, ass_path, sfx: Path, sfx_at, 
     last = "s1"
     if cam:
         x, y, cw, ch = cam
-        fg.append(f"[c]crop={cw}:{ch}:{x}:{y},scale={W}:{CAM_H}:force_original_aspect_ratio=increase,"
-                  f"crop={W}:{CAM_H},setsar=1[cam]")
+        camf = (f"[c]crop={cw}:{ch}:{x}:{y},scale={W}:{CAM_H}:force_original_aspect_ratio=increase,"
+                f"crop={W}:{CAM_H},setsar=1,fps={FPS}")
+        if peaks:  # au moment fort, on zoome sur la tête du streamer
+            cb = "+".join(f"max(0,1-abs(it-{p})/1.1)" for p in peaks[:2])
+            camf += (f",zoompan=z='1+0.55*min(1,1.6*({cb}))':d=1:x='iw/2-(iw/zoom/2)':y='ih*0.42-(ih/zoom/2)'"
+                     f":s={W}x{CAM_H}:fps={FPS}")
+        fg.append(camf + "[cam]")
         fg.append(f"[{last}][cam]overlay=0:{CAM_Y}[s2]")
         last = "s2"
     else:
@@ -336,8 +368,8 @@ def encode(src: Path, out: Path, info, cam, peaks, ass_path, sfx: Path, sfx_at, 
             inputs.append(["-t", str(r_dur), "-i", str(rp)])
         r_at = min(r_at, max(dur - r_dur, 0))
         ri = len(inputs) - 1
-        fg.append(f"[{ri}:v]scale=720:-2,pad=iw+16:ih+16:8:8:white,setpts=PTS-STARTPTS+{r_at}/TB[rx]")
-        fg.append(f"[{last}][rx]overlay=(W-w)/2:{gy}+({GAME_H}-h)/2:enable='between(t,{r_at},{r_at + r_dur})'"
+        fg.append(f"[{ri}:v]scale=380:-2,pad=iw+12:ih+12:6:6:white,setpts=PTS-STARTPTS+{r_at}/TB[rx]")
+        fg.append(f"[{last}][rx]overlay=W-w-24:{gy + GAME_H}-h-24:enable='between(t,{r_at},{r_at + r_dur})'"
                   f":eof_action=pass[s3]")
         last = "s3"
     logo = C.ASSETS / "brand" / "logo_bug.png"
@@ -392,6 +424,9 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
     work.mkdir(parents=True, exist_ok=True)
     src = src or download(clip["url"], work / f"{clip['id']}_src.mp4")
     info = probe(src)
+    ok, why = nsfw_check(src, work)
+    if not ok:
+        raise UnsafeClip(f"nudité détectée ({why})")
     tr = transcribe(src, lang) if info["audio"] else {"words": [], "segments": []}
     transcript = " ".join(w[2] for w in tr["words"])
     words = tr["words"]
@@ -468,13 +503,8 @@ def render_compilation(clips: list, title: str, work: Path, out_lang: str = None
             parts.append(r["path"])
         except Exception as e:
             print(f"⚠️ Clip ignoré ({clip['url']}) : {e}")
-    lst = work / "list.txt"
-    lst.write_text("".join(f"file '{p.resolve()}'\n" for p in parts), encoding="utf-8")
     out = work / f"compilation_{re.sub(r'[^a-z0-9]+', '_', title.lower())[:40]}.mp4"
-    run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst),
-         "-c:v", "libx264", "-preset", "veryfast", "-crf", "22", "-pix_fmt", "yuv420p", "-r", str(FPS),
-         "-c:a", "aac", "-b:a", "160k", "-ar", "44100", "-movflags", "+faststart", str(out)])
-    return out
+    return concat(with_zaps(parts, work), out)
 
 
 def trim_best(src: Path, out: Path, seconds: float = 9.0) -> Path:
@@ -509,6 +539,33 @@ def concat(parts: list, out: Path, target_mb=None) -> Path:
     return out
 
 
+def render_zap(work: Path, channel: int, seconds: float = 0.5) -> Path:
+    """Transition « zapping » : neige télé + numéro de chaîne + bruit de zap."""
+    work.mkdir(parents=True, exist_ok=True)
+    ass = work / f"zap{channel}.ass"
+    ass.write_text(ass_header() + f"Dialogue: 1,0:00:00.00,{ts(seconds)},Kicker,,0,0,0,,"
+                   f"{{\\an9\\pos({W - 40},60)\\3c&H000000&\\1c&H6CFF39&}}CH {channel:02d}\n", encoding="utf-8")
+    out = work / f"zap{channel}.mp4"
+    run(["ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i", f"color=c=gray:s={W // 4}x{H // 4}:r={FPS}:d={seconds}",
+         "-i", str(C.ASSETS / "sfx" / "zap.wav"), "-filter_complex",
+         f"[0:v]noise=alls=100:allf=t+u,hue=s=0,scale={W}:{H}:flags=neighbor,eq=contrast=1.6,"
+         f"fade=t=in:st=0:d=0.08:color=white,ass='{_esc(ass)}':fontsdir='{_esc(C.FONT.parent)}'[v];"
+         f"[1:a]apad,atrim=0:{seconds},aresample=44100,aformat=channel_layouts=stereo[a]",
+         "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p",
+         "-c:a", "aac", "-b:a", "128k", "-ar", "44100", "-t", str(seconds), str(out)])
+    return out
+
+
+def with_zaps(parts: list, work: Path) -> list:
+    """Intercale une transition zapping entre chaque séquence."""
+    out = []
+    for i, p in enumerate(parts):
+        if i > 0:
+            out.append(render_zap(work, i + 1))
+        out.append(p)
+    return out
+
+
 def render_flash(clips: list, title: str, work: Path, lang: str, target_mb=None) -> Path:
     """Flash info : générique + 3 à 5 brèves courtes (le meilleur moment de chaque clip)."""
     work.mkdir(parents=True, exist_ok=True)
@@ -519,9 +576,9 @@ def render_flash(clips: list, title: str, work: Path, lang: str, target_mb=None)
             w = work / clip["id"]
             w.mkdir(parents=True, exist_ok=True)
             full = download(clip["url"], w / "full.mp4")
-            short = trim_best(full, w / "best.mp4")
+            short = trim_best(full, w / "best.mp4", C.FLASH_SECONDS)
             r = render_short(clip, w, target_mb=None, src=short, out_lang=lang, brief=(i, n))
             parts.append(r["path"])
         except Exception as e:
             print(f"⚠️ Brève ignorée ({clip['url']}) : {e}")
-    return concat(parts, work / "flash.mp4", target_mb)
+    return concat(with_zaps(parts, work), work / "flash.mp4", target_mb)

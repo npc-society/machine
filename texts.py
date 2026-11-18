@@ -185,3 +185,26 @@ def translate_segments(segments, src, dst):
     except Exception as e:
         print(f"⚠️ Traduction IA impossible : {e}")
         return []
+
+
+def rate_clip(clip, transcript, category):
+    """Note IA du clip : drôle ou intéressant (1-10) et publiable (pas de propos haineux, sexuels, etc.).
+    Renvoie None sans clé API (le clip est alors gardé)."""
+    if not C.ANTHROPIC_API_KEY:
+        return None
+    prompt = (
+        "Tu tries des clips de streamers sur GTA 6 pour une page TikTok/Instagram d'humour. "
+        f"Streamer : {clip['streamer']}. Titre du clip : « {clip['title']} ». Catégorie : {category}. "
+        f"Ce qui se dit : « {transcript[:2000]} ».\n"
+        "Note de 1 à 10 à quel point ce clip est drôle OU intéressant pour quelqu'un qui scrolle "
+        "(réaction forte, situation absurde, exploit, découverte ; 1-4 = banal ou incompréhensible sans contexte). "
+        "safe = false si le clip contient des propos haineux, du harcèlement, du contenu sexuel explicite, "
+        "des infos personnelles ou une vraie mise en danger. "
+        "Réponds uniquement en JSON : {\"score\": 7, \"safe\": true, \"raison\": \"...\"}"
+    )
+    try:
+        d = _json(_claude(prompt, 300))
+        return {"score": int(d.get("score", 5)), "safe": bool(d.get("safe", True)), "raison": d.get("raison", "")}
+    except Exception as e:
+        print(f"⚠️ Note IA impossible : {e}")
+        return None
