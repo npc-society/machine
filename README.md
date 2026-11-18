@@ -24,6 +24,11 @@ Repérage, tri depuis Discord, montage automatique et compilations. Elle tourne 
 5. **Le dimanche à 18 h**, la compilation « Top 10 de la semaine » est montée à partir de tes clips ⭐. Le lien arrive dans `#montages`.
 6. **Chaque soir**, tu reçois le récap avec le top du jour et les pépites du jour.
 
+## Titres
+- **Sans clé IA :** la machine reprend le titre du clip Twitch s'il décrit l'action (« SQUEEZIE : IL CRASH LA VOITURE DE POLICE »). Sinon, elle utilise un titre descriptif selon la catégorie.
+- **Avec la clé :** l'IA écrit un titre d'après ce qui se passe vraiment dans le clip, taquin mais jamais insultant ni trompeur.
+- **Tampons de presse :** désactivés. Pour les réactiver, crée la variable `STAMPS` = `1`.
+
 ## Tri automatique
 - **Clips trop courts ignorés** : moins de 15 s (variable `MIN_CLIP_SECONDS`).
 - **Nudité** : chaque clip est analysé image par image (NudeNet). En cas de nudité, il est écarté et rien n'est monté.

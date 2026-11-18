@@ -449,7 +449,7 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
     meme = pick_meme(out_lang, category, seed)
     peak = peaks[0] if peaks else (info["dur"] * 0.6 if info["dur"] > 4 else None)
     ass_path = work / f"{clip['id']}_{out_lang}.ass"
-    build_ass(ass_path, words, info["dur"], txt, meme["stamp"], peak, clip["streamer"], out_lang, seed,
+    build_ass(ass_path, words, info["dur"], txt, meme["stamp"] if C.STAMPS else None, peak, clip["streamer"], out_lang, seed,
               layout, rank=rank, brief=brief)
     sfx = None
     if meme["sfx"]:

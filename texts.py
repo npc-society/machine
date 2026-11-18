@@ -13,49 +13,47 @@ import config as C
 from categorize import CATEGORIES
 
 HEADLINES = {
-    "es": {
-        "rage": ["UN STREAMER PIERDE LOS NERVIOS EN DIRECTO", "{s} EXPLOTA: LOS VECINOS LO OYERON TODO",
-                 "CRISIS DE NERVIOS EN VICE CITY: {s} ROMPE SU SILENCIO"],
-        "fail": ["ROBA UN COCHE Y SE ARREPIENTE AL INSTANTE", "{s}: LA TRAGEDIA QUE NADIE VIO VENIR",
-                 "NO VAS A CREER LO QUE HIZO {s}"],
-        "incroyable": ["{s} LOGRA LO IMPOSIBLE, LOS EXPERTOS SIN PALABRAS", "LO QUE HIZO {s} TE VA A IMPACTAR",
-                       "LOS NPC TODAVÍA NO SE LO CREEN"],
-        "decouverte": ["LO QUE ROCKSTAR NO QUERÍA QUE SUPIERAS", "{s} DESCUBRE UN SECRETO DE GTA 6",
-                       "REVELADO: EL DETALLE QUE LO CAMBIA TODO"],
-        "course": ["PERSECUCIÓN: LA POLICÍA DE VICE CITY HUMILLADA", "{s} DEJA ATRÁS A LA POLICÍA",
-                   "FUGA ESPECTACULAR: UN TESTIGO LO CUENTA"],
-        "drole": ["INSÓLITO: {s} DEJA EN SHOCK A VICE CITY", "ESCÁNDALO: LOS NPC DENUNCIAN A {s}",
-                  "TODO SOBRE EL INCIDENTE DE {s}"],
-    },
     "fr": {
-        "rage": ["UN STREAMER PERD LES PÉDALES EN DIRECT", "{s} CRAQUE : LES VOISINS ONT TOUT ENTENDU",
-                 "CRISE DE NERFS À VICE CITY : {s} SORT DU SILENCE"],
-        "fail": ["IL VOLE UN VÉHICULE ET LE REGRETTE AUSSITÔT", "{s} : LE DRAME QUE PERSONNE N'AVAIT VU VENIR",
-                 "VOUS N'ALLEZ PAS CROIRE CE QUE {s} A FAIT"],
-        "incroyable": ["{s} RÉALISE L'IMPOSSIBLE, LES EXPERTS SANS VOIX", "CE QUE {s} A FAIT VA VOUS CHOQUER",
-                       "LES PNJ N'EN REVIENNENT TOUJOURS PAS"],
-        "decouverte": ["CE QUE ROCKSTAR NE VOULAIT PAS QUE VOUS SACHIEZ", "{s} DÉCOUVRE UN SECRET DE GTA 6",
-                       "RÉVÉLATIONS : LE DÉTAIL QUI CHANGE TOUT"],
-        "course": ["COURSE-POURSUITE : LA POLICE DE VICE CITY HUMILIÉE", "{s} SÈME LA POLICE ET LE CHAOS",
-                   "FUITE SPECTACULAIRE : UN TÉMOIN RACONTE"],
-        "drole": ["INSOLITE : {s} PROVOQUE LA STUPEUR À VICE CITY", "SCANDALE : LES PNJ PORTENT PLAINTE CONTRE {s}",
-                  "ON VOUS DIT TOUT SUR L'INCIDENT {s}"],
+        "rage": ["{s} PERD SON CALME SUR GTA 6", "LE MOMENT OÙ {s} CRAQUE EN DIRECT", "{s} VS GTA 6 : LA PATIENCE A LÂCHÉ"],
+        "fail": ["{s} TENTE UN TRUC… ÇA TOURNE MAL", "{s} AVAIT UN PLAN. LE PLAN N'A PAS TENU", "GROSSE BOULETTE DE {s} SUR GTA 6"],
+        "incroyable": ["{s} RÉUSSIT UN COUP INCROYABLE SUR GTA 6", "PERSONNE NE S'ATTENDAIT À ÇA DE {s}", "{s} SORT UNE ACTION FOLLE"],
+        "decouverte": ["{s} TOMBE SUR UN DÉTAIL FOU DE GTA 6", "CE QUE {s} DÉCOUVRE DANS GTA 6", "{s} EXPLORE GTA 6 ET TROUVE ÇA"],
+        "course": ["{s} CONTRE LA POLICE DE GTA 6", "COURSE-POURSUITE MOUVEMENTÉE POUR {s}", "{s} TENTE DE SEMER LA POLICE"],
+        "drole": ["{s} ET GTA 6, ÇA DONNE ÇA", "LA SCÈNE ABSURDE DE {s} SUR GTA 6", "{s} NE S'ATTENDAIT PAS À ÇA"],
     },
     "en": {
-        "rage": ["STREAMER LOSES IT LIVE ON AIR", "{s} SNAPS: NEIGHBORS HEARD EVERYTHING",
-                 "MELTDOWN IN VICE CITY: {s} BREAKS SILENCE"],
-        "fail": ["MAN STEALS CAR, IMMEDIATELY REGRETS IT", "{s}: THE TRAGEDY NOBODY SAW COMING",
-                 "YOU WON'T BELIEVE WHAT {s} JUST DID"],
-        "incroyable": ["{s} DOES THE IMPOSSIBLE, EXPERTS SPEECHLESS", "WHAT {s} DID WILL SHOCK YOU",
-                       "NPCS STILL CAN'T BELIEVE IT"],
-        "decouverte": ["WHAT ROCKSTAR DIDN'T WANT YOU TO KNOW", "{s} UNCOVERS A GTA 6 SECRET",
-                       "REVEALED: THE DETAIL THAT CHANGES EVERYTHING"],
-        "course": ["HIGH-SPEED CHASE: VICE CITY POLICE HUMILIATED", "{s} LEAVES COPS IN THE DUST",
-                   "DRAMATIC ESCAPE: WITNESS SPEAKS OUT"],
-        "drole": ["BIZARRE: {s} STUNS VICE CITY", "SCANDAL: NPCS FILE COMPLAINT AGAINST {s}",
-                  "EVERYTHING WE KNOW ABOUT THE {s} INCIDENT"],
+        "rage": ["{s} LOSES HIS COOL IN GTA 6", "THE MOMENT {s} SNAPS LIVE", "{s} VS GTA 6: PATIENCE IS GONE"],
+        "fail": ["{s} TRIES SOMETHING… IT GOES WRONG", "{s} HAD A PLAN. THE PLAN DID NOT SURVIVE", "BIG GTA 6 BLUNDER BY {s}"],
+        "incroyable": ["{s} PULLS OFF SOMETHING INSANE IN GTA 6", "NOBODY EXPECTED THIS FROM {s}", "{s}'S WILDEST GTA 6 MOVE"],
+        "decouverte": ["{s} FINDS A CRAZY GTA 6 DETAIL", "WHAT {s} JUST FOUND IN GTA 6", "{s} EXPLORES GTA 6 AND FINDS THIS"],
+        "course": ["{s} VS THE GTA 6 POLICE", "A WILD CHASE FOR {s}", "{s} TRIES TO LOSE THE COPS"],
+        "drole": ["{s} + GTA 6 = THIS", "{s}'S MOST ABSURD GTA 6 SCENE", "{s} DID NOT SEE THAT COMING"],
+    },
+    "es": {
+        "rage": ["{s} PIERDE LA CALMA EN GTA 6", "EL MOMENTO EN QUE {s} EXPLOTA EN DIRECTO", "{s} VS GTA 6: SE ACABÓ LA PACIENCIA"],
+        "fail": ["{s} INTENTA ALGO… Y SALE MAL", "{s} TENÍA UN PLAN. EL PLAN NO AGUANTÓ", "GRAN METEDURA DE PATA DE {s}"],
+        "incroyable": ["{s} LOGRA ALGO INCREÍBLE EN GTA 6", "NADIE ESPERABA ESTO DE {s}", "LA JUGADA MÁS LOCA DE {s}"],
+        "decouverte": ["{s} ENCUENTRA UN DETALLE LOCO DE GTA 6", "LO QUE {s} DESCUBRE EN GTA 6", "{s} EXPLORA GTA 6 Y ENCUENTRA ESTO"],
+        "course": ["{s} CONTRA LA POLICÍA DE GTA 6", "UNA PERSECUCIÓN DE LOCOS PARA {s}", "{s} INTENTA DESPISTAR A LA POLICÍA"],
+        "drole": ["{s} + GTA 6 = ESTO", "LA ESCENA MÁS ABSURDA DE {s}", "{s} NO SE ESPERABA ESTO"],
     },
 }
+
+FILLER = {"mdr", "ptdr", "lol", "lmao", "kekw", "omegalul", "xd", "jaja", "jajaja", "wtf", "clip", "gta", "gta6",
+          "gtavi", "6", "vi", "lul", "pog", "poggers", "jpp"}
+
+
+def headline_from_title(clip):
+    """Le titre du clip Twitch (écrit par les viewers) décrit souvent bien l'action : on s'en sert s'il est exploitable."""
+    import re as _re
+    title = _re.sub(r"[\U0001F000-\U0001FAFF\u2600-\u27BF\uFE0F\u200D#@]", " ", clip.get("title", ""))
+    words = [w for w in title.split() if w.lower().strip(".,!?:;") not in FILLER]
+    if len(words) < 3 or len(" ".join(words)) > 70:
+        return None
+    text = " ".join(words).strip(" -:.,!").upper()
+    s = clip["streamer"].upper()
+    return text if s in text else f"{s} : {text}"
+
 
 # Commentaires moqueurs du bandeau défilant (utilisés sans clé IA)
 TICKERS = {
@@ -147,7 +145,8 @@ def _template(clip, category, seed, lang):
     lang = lang if lang in HEADLINES else "en"
     s = clip["streamer"].upper()
     rnd = random.Random(seed)
-    headline = rnd.choice(HEADLINES[lang][category]).format(s=s)
+    headline = (headline_from_title(clip) if lang == clip.get("lang") else None) \
+        or rnd.choice(HEADLINES[lang][category]).format(s=s)
     ticker = [t.format(s=s) for t in rnd.sample(TICKERS[lang][category], k=min(2, len(TICKERS[lang][category])))]
     title = headline.capitalize() + " 📰"
     return {"headline": headline, "ticker": ticker, "title": title,
@@ -157,18 +156,19 @@ def _template(clip, category, seed, lang):
 def _ai(clip, category, transcript, lang):
     lang_name = {"fr": "français", "en": "English", "es": "español"}.get(lang, lang)
     prompt = (
-        "Tu écris pour NPC Society, une page TikTok/Instagram qui parodie les chaînes d'info et la presse à "
-        "scandale : chaque moment de streamer sur GTA 6 est traité comme un fait divers. "
+        "Tu écris pour NPC Society, une page TikTok/Instagram qui reprend les moments marquants des streamers sur "
+        "GTA 6, avec un habillage de chaîne d'info légèrement satirique. "
         f"Écris en {lang_name}. Streamer : {clip['streamer']}. Catégorie : {category}. "
         f"Titre du clip sur Twitch : « {clip['title']} ». Ce qui se dit dans le clip : « {transcript[:1500]} ».\n"
         "Donne :\n"
-        "- headline : gros titre racoleur en MAJUSCULES, 5 à 10 mots, lié à ce qui se passe vraiment dans le clip ;\n"
-        "- ticker : 2 commentaires moqueurs façon bandeau d'info en MAJUSCULES (6 à 10 mots chacun), qui "
-        "commentent l'action précise du clip avec ironie (faux témoignages, fausses réactions officielles, "
-        "pince-sans-rire) ;\n"
-        "- title : le gros titre réécrit normalement avec 1 emoji, pour la légende.\n"
-        "Règles : on se moque de la situation, jamais de la personne ; pas d'insulte, pas de politique, "
-        "pas de vrai média cité. Réponds uniquement en JSON : {\"headline\": \"\", \"ticker\": [\"\", \"\"], \"title\": \"\"}"
+        "- headline : titre en MAJUSCULES, 5 à 10 mots, qui dit clairement CE QUI SE PASSE dans le clip (on doit "
+        "comprendre le sujet sans le son) et donne envie de regarder jusqu'au bout. Ton taquin, un peu moqueur ;\n"
+        "- ticker : 2 courts commentaires ironiques en MAJUSCULES (6 à 10 mots) sur l'action précise du clip ;\n"
+        "- title : le titre réécrit normalement avec 1 emoji, pour la légende.\n"
+        "Règles strictes : jamais insultant ni humiliant pour le streamer ; jamais trompeur (n'invente pas de fait, "
+        "de chiffre, de drame ou de citation qui ne sont pas dans le clip) ; pas de politique ; pas de vrai média cité. "
+        "Si le contenu du clip est flou, reste général plutôt que d'inventer. "
+        "Réponds uniquement en JSON : {\"headline\": \"\", \"ticker\": [\"\", \"\"], \"title\": \"\"}"
     )
     d = _json(_claude(prompt))
     return {"headline": d["headline"], "ticker": d["ticker"][:3], "title": d["title"],
