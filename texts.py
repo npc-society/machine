@@ -56,7 +56,7 @@ def headline_from_title(clip):
     import re as _re
     title = _re.sub(r"[\U0001F000-\U0001FAFF\u2600-\u27BF\uFE0F\u200D#@]", " ", clip.get("title", ""))
     words = [w for w in title.split() if w.lower().strip(".,!?:;") not in FILLER]
-    if len(words) < 3 or len(" ".join(words)) > 70:
+    if len(words) < 4 or len(" ".join(words)) > 70:
         return None
     text = " ".join(words).strip(" -:.,!").upper()
     s = clip["streamer"].upper()
@@ -128,6 +128,21 @@ def _count_call():
     C.save_json(USAGE_FILE, usage)
 
 
+ERRORS_FILE = C.DATA / "ai_errors.json"
+
+
+def _log_error(where, e, resp=None):
+    """Garde les 10 dernières erreurs IA (sans la clé) dans data/ai_errors.json pour le diagnostic."""
+    from datetime import datetime, timezone
+    errs = C.load_json(ERRORS_FILE, default=[])
+    detail = str(e)[:300]
+    if resp is not None:
+        detail += f" | HTTP {resp.status_code} : {resp.text[:400]}"
+    errs = (errs + [{"quand": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "où": where,
+                      "erreur": detail}])[-10:]
+    C.save_json(ERRORS_FILE, errs)
+
+
 def _claude(prompt: str, max_tokens: int = 700, images=None) -> str:
     """Appel au modèle. images = liste de chemins .jpg (le modèle « voit » le clip)."""
     import base64
@@ -141,8 +156,10 @@ def _claude(prompt: str, max_tokens: int = 700, images=None) -> str:
         "x-api-key": C.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json"},
         json={"model": C.ANTHROPIC_MODEL, "max_tokens": max_tokens,
               "messages": [{"role": "user", "content": content}]})
-    r.raise_for_status()
-    return r.json()["content"][0]["text"]
+    if r.status_code != 200:
+        _log_error("api", RuntimeError("réponse en erreur"), r)
+        r.raise_for_status()
+    return "".join(b.get("text", "") for b in r.json().get("content", []) if b.get("type") == "text")
 
 
 def _json(text: str):
@@ -190,8 +207,10 @@ def _ai(clip, category, transcript, lang, frames=None):
         "face caméra sans jeu).\n"
         "- nudite : true si on voit de la nudité ou un contenu sexuel, même dans le jeu.\n"
         "- safe : false si propos haineux, harcèlement, contenu sexuel explicite, infos personnelles, vraie mise en danger.\n"
-        "- score : de 1 à 10, à quel point le clip est drôle OU intéressant pour quelqu'un qui scrolle "
-        "(1-4 = banal ou incompréhensible sans contexte).\n"
+        "- score : de 1 à 10, à quel point le clip est drôle OU intéressant pour quelqu'un qui scrolle. Sois exigeant : "
+        "1-4 = banal, peu d'action, discussion ou menu, incompréhensible sans contexte ; 5-6 = correct ; "
+        "7+ = il se passe vraiment quelque chose (réaction forte, chaos, exploit, absurde, découverte).\n"
+        "- categorie : rage, fail, incroyable, decouverte, course ou drole.\n"
         f"2) TEXTES en {lang_name} :\n"
         "- headline : titre en MAJUSCULES, 6 à 11 mots, façon titre de média accrocheur, qui DÉCRIT L'ACTION visible "
         "(qui fait quoi, avec quoi, où, et ce qui tourne mal ou bien), pour qu'on comprenne le sujet sans le son. "
@@ -204,10 +223,11 @@ def _ai(clip, category, transcript, lang, frames=None):
         "Règles : jamais insultant ni humiliant ; jamais trompeur (n'invente ni fait, ni chiffre, ni citation absents "
         "du clip) ; pas de politique ; pas de vrai média cité. Si l'action est floue, reste général.\n"
         "Réponds uniquement en JSON : {\"gameplay\": true, \"nudite\": false, \"safe\": true, \"score\": 7, "
-        "\"raison\": \"...\", \"headline\": \"\", \"ticker\": [\"\", \"\"], \"title\": \"\"}"
+        "\"raison\": \"...\", \"categorie\": \"drole\", \"headline\": \"\", \"ticker\": [\"\", \"\"], \"title\": \"\"}"
     )
     d = _json(_claude(prompt, 700, images=frames))
-    analysis = {"gameplay": bool(d.get("gameplay", True)), "nudite": bool(d.get("nudite", False)),
+    analysis = {"categorie": d.get("categorie") if d.get("categorie") in CATEGORIES else None,
+                "gameplay": bool(d.get("gameplay", True)), "nudite": bool(d.get("nudite", False)),
                 "safe": bool(d.get("safe", True)), "score": int(d.get("score", 5)), "raison": d.get("raison", "")}
     return {"headline": d["headline"], "ticker": d["ticker"][:3], "title": d["title"],
             "caption": _caption(clip, lang, d["title"], category), "analysis": analysis}
@@ -222,6 +242,7 @@ def describe(clip, category, transcript="", seed=None, lang=None, frames=None):
             return _ai(clip, category, transcript, lang, frames)
         except Exception as e:
             print(f"⚠️ IA indisponible, modèle de texte utilisé : {e}")
+            _log_error("describe", e)
     return _template(clip, category, seed, lang)
 
 

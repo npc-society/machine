@@ -120,7 +120,7 @@ def audio_peaks(path: Path, dur: float, max_peaks: int = 3) -> list:
         return []
     rms = np.sqrt((x[: n * win].reshape(n, win) ** 2).mean(axis=1) + 1e-9)
     rms = np.convolve(rms, np.ones(3) / 3, mode="same")
-    thr = rms.mean() + 1.2 * rms.std()
+    thr = rms.mean() + 2.0 * rms.std()   # seul un vrai pic (cri, rire, explosion) déclenche le zoom
     peaks = []
     for i in np.argsort(rms)[::-1]:
         t = i * 0.1
@@ -328,12 +328,15 @@ def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, la
     lines = list(txt.get("ticker") or [])
     extra = list(b.get("ticker", {}).get(lang, []))
     random.Random(seed + "t").shuffle(extra)
-    crawl = "   ●   ".join(ass_text(x) for x in (lines + extra[:2])) or ass_text(b.get("name", ""))
-    width = int(len(crawl) * 19)
-    speed = 210
+    seq = "   ●   ".join(ass_text(x) for x in (lines + extra[:2])) or ass_text(b.get("name", ""))
+    speed = 170                                   # px/s ; le texte défile en boucle, le bandeau n'est jamais vide
+    need = speed * dur + W
+    reps = max(2, int(need / max(len(seq) * 19, 1)) + 2)
+    crawl = ("   ●   ".join([seq] * reps))
+    x0 = 330                                      # démarre déjà visible, juste après l'étiquette
     label = {"fr": "DERNIÈRE MINUTE", "es": "ÚLTIMA HORA"}.get(lang, "BREAKING NEWS")
-    ev.append(f"Dialogue: 4,0:00:00.00,{end},Ticker,,0,0,0,,{{\\q2\\move({W + 20},{band_y + 38},{-width},"
-              f"{band_y + 38},0,{int((W + width) / speed * 1000)})}}{crawl}")
+    ev.append(f"Dialogue: 4,0:00:00.00,{end},Ticker,,0,0,0,,{{\\q2\\an4\\move({x0},{band_y + 38},{int(x0 - speed * dur)},"
+              f"{band_y + 38},0,{int(dur * 1000)})}}{crawl}")
     ev.append(f"Dialogue: 6,0:00:00.00,{end},TickLbl,,0,0,0,,{{\\pos(14,{band_y + 38})}}{label}")
 
     # Sous-titres sur le bas du clip : blocs de 3 mots max, coupés aux pauses
@@ -393,8 +396,8 @@ def encode(src: Path, out: Path, info, cam, peaks, ass_path, sfx: Path, sfx_at, 
     # Le jeu, zoomé aux moments forts (seulement le jeu, pas l'habillage)
     game = f"[b]scale={W}:{GAME_H}:force_original_aspect_ratio=increase,crop={W}:{GAME_H},setsar=1,fps={FPS}"
     if peaks:
-        bumps = "+".join(f"max(0,1-abs(it-{p})/0.45)" for p in peaks)
-        game += (f",zoompan=z='1+0.13*min(1,{bumps})':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
+        bumps = f"max(0,1-abs(it-{peaks[0]})/0.5)"
+        game += (f",zoompan=z='1+0.06*{bumps}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
                  f":s={W}x{GAME_H}:fps={FPS}")
     if censor:  # nudité : jeu fortement flouté sur ces passages
         game += f",boxblur=60:6:enable='{_enable(censor)}'"
@@ -416,8 +419,8 @@ def encode(src: Path, out: Path, info, cam, peaks, ass_path, sfx: Path, sfx_at, 
         camf = (f"[c]crop={cw}:{ch}:{x}:{y},scale={W}:{CAM_H}:force_original_aspect_ratio=increase,"
                 f"crop={W}:{CAM_H},setsar=1,fps={FPS}")
         if peaks:  # au moment fort, on zoome sur la tête du streamer
-            cb = "+".join(f"max(0,1-abs(it-{p})/1.1)" for p in peaks[:2])
-            camf += (f",zoompan=z='1+0.55*min(1,1.6*({cb}))':d=1:x='iw/2-(iw/zoom/2)':y='ih*0.42-(ih/zoom/2)'"
+            cb = f"max(0,1-abs(it-{peaks[0]})/1.0)"
+            camf += (f",zoompan=z='1+0.30*min(1,1.5*{cb})':d=1:x='iw/2-(iw/zoom/2)':y='ih*0.42-(ih/zoom/2)'"
                      f":s={W}x{CAM_H}:fps={FPS}")
         fg.append(camf + "[cam]")
         fg.append(f"[{last}][cam]overlay=0:{CAM_Y}[s2]")
@@ -526,6 +529,8 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
     frames = sample_frames(src, work, info["dur"], peak=peaks[0] if peaks else None) if C.ANTHROPIC_API_KEY else []
     txt = texts.describe(clip, category, transcript, seed=seed, lang=out_lang, frames=frames)
     a = txt.get("analysis")
+    if a and a.get("categorie"):
+        category = a["categorie"]
     if a and strict:
         if not a["gameplay"]:
             raise UnsafeClip(f"pas du gameplay GTA ({a['raison']})")
