@@ -48,6 +48,13 @@ env:
   PER_RUN_BIG: ${{ vars.PER_RUN_BIG || '3' }}
   PER_RUN_SMALL: ${{ vars.PER_RUN_SMALL || '2' }}
   WHISPER_MODEL: ${{ vars.WHISPER_MODEL || 'small' }}
+  IG_TOKEN_FR: ${{ secrets.IG_TOKEN_FR }}
+  IG_USER_FR: ${{ secrets.IG_USER_FR }}
+  IG_TOKEN_EN: ${{ secrets.IG_TOKEN_EN }}
+  IG_USER_EN: ${{ secrets.IG_USER_EN }}
+  IG_TOKEN_ES: ${{ secrets.IG_TOKEN_ES }}
+  IG_USER_ES: ${{ secrets.IG_USER_ES }}
+  IG_MAX_PER_DAY: ${{ vars.IG_MAX_PER_DAY || '2' }}
   GH_TOKEN: ${{ github.token }}
 
 jobs:
@@ -74,7 +81,7 @@ jobs:
             # Déclenchement externe toutes les 30 min (cron-job.org) : on reproduit le planning selon l'heure UTC
             H=$(date -u +%H); M=$(date -u +%M); D=$(date -u +%u)
             if [ "$M" -lt 30 ]; then HUNT=hunt; fi
-            if [ "$H" = "21" ] && [ "$M" -ge 30 ]; then HUNT=daily; fi
+            if [ "$H" = "21" ] && [ "$M" -ge 30 ]; then HUNT=daily; python publisher.py tokens || true; fi
             if [ "$H" = "17" ] && [ "$M" -ge 30 ]; then FLASH=true; fi
             if [ "$D" = "7" ] && [ "$H" = "17" ] && [ "$M" -lt 30 ]; then COMPIL=true; fi
           elif [ "$S" = "45 21 * * *" ]; then HUNT=daily
@@ -115,6 +122,9 @@ jobs:
       - name: Montage des shorts
         if: steps.check.outputs.queue != '0'
         run: python worker.py render
+
+      - name: Publication Instagram (montages validés ✅)
+        run: python publisher.py
 
       - name: Compilation de la semaine
         if: steps.plan.outputs.compil == 'true'

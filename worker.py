@@ -96,6 +96,10 @@ def check():
                 choice = D.user_choice(msg, D.VALIDATE)
                 if choice == "valide":
                     m["status"] = "valide"
+                    import publisher
+                    key = f"{m['clip_id']}:{m['lang']}"
+                    if publisher.enqueue(key, m):
+                        print(f"📲 {key} en file pour Instagram")
                 elif choice == "jeter":
                     m["status"] = "jete"
                 elif choice == "refaire":

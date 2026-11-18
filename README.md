@@ -97,3 +97,10 @@ Repérage, tri depuis Discord, montage automatique et compilations. Elle tourne 
 - Le logo, le logo d'intro et la photo de profil sont dans `assets/brand/`.
 - Pour les régénérer après avoir changé les couleurs dans `brand/brand.json`, lance `python make_brand.py`.
 - Polices utilisées, toutes libres (licence OFL) : Barlow Condensed pour les titres et bandeaux, Archivo Black pour le logo et les tampons.
+
+## Publication automatique sur Instagram
+- Quand tu mets ✅ sur une vidéo montée dans `#montages-xx`, elle part en file d'attente et est publiée en Reel sur le compte Instagram de la langue, avec sa légende et ses hashtags.
+- **Rythme d'échauffement :** `IG_MAX_PER_DAY` Reels par jour et par compte (2 par défaut), et au moins `IG_MIN_GAP_HOURS` heures entre deux posts (3 par défaut). Monte progressivement.
+- **Secrets :** `IG_TOKEN_FR` et `IG_USER_FR` (idem pour `_EN` et `_ES`), à générer sur developers.facebook.com.
+- **Expiration :** les jetons Instagram durent 60 jours. La machine te prévient dans Discord quand un jeton ne marche plus.
+- **Le son :** l'API ne permet pas d'ajouter un son tendance. Les Reels publiés automatiquement gardent le son d'origine du clip.

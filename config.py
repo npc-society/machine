@@ -72,6 +72,9 @@ ANTHROPIC_MODEL = env("ANTHROPIC_MODEL", "claude-haiku-5-5")
 STAMPS = env("STAMPS", "0") == "1"                # tampons de presse au moment fort (désactivés)
 AI_MAX_CALLS_PER_DAY = env_int("AI_MAX_CALLS_PER_DAY", 500)  # ~0,15 $ max par jour avec Haiku 5.5
 
+IG_MAX_PER_DAY = env_int("IG_MAX_PER_DAY", 2)      # rythme d'échauffement : 2 Reels par jour et par compte
+IG_MIN_GAP_HOURS = env_int("IG_MIN_GAP_HOURS", 3)  # au moins 3 h entre deux posts
+
 FLAGS = {"fr": "🇫🇷", "en": "🇬🇧", "es": "🇪🇸", "de": "🇩🇪", "pt": "🇧🇷", "it": "🇮🇹"}
 
 
