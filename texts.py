@@ -154,16 +154,31 @@ def _claude(prompt: str, max_tokens: int = 700, images=None) -> str:
     content.append({"type": "text", "text": prompt})
     r = requests.post("https://api.anthropic.com/v1/messages", timeout=90, headers={
         "x-api-key": C.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json"},
-        json={"model": C.ANTHROPIC_MODEL, "max_tokens": max_tokens,
+        json={"model": C.ANTHROPIC_MODEL, "max_tokens": max(max_tokens, 1500),
+              "thinking": {"type": "disabled"},
               "messages": [{"role": "user", "content": content}]})
+    if r.status_code == 400 and "thinking" in r.text:  # si le modèle refuse ce réglage, on réessaie sans
+        r = requests.post("https://api.anthropic.com/v1/messages", timeout=90, headers={
+            "x-api-key": C.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json"},
+            json={"model": C.ANTHROPIC_MODEL, "max_tokens": 4000, "messages": [{"role": "user", "content": content}]})
     if r.status_code != 200:
         _log_error("api", RuntimeError("réponse en erreur"), r)
         r.raise_for_status()
-    return "".join(b.get("text", "") for b in r.json().get("content", []) if b.get("type") == "text")
+    data = r.json()
+    text = "".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text")
+    if not text.strip():
+        kinds = [b.get("type") for b in data.get("content", [])]
+        _log_error("api", RuntimeError(f"réponse sans texte : stop={data.get('stop_reason')} blocs={kinds} "
+                                       f"usage={data.get('usage')}"))
+        raise RuntimeError("réponse IA vide")
+    return text
 
 
 def _json(text: str):
-    start = min([i for i in (text.find("{"), text.find("[")) if i >= 0])
+    found = [i for i in (text.find("{"), text.find("[")) if i >= 0]
+    if not found:
+        raise ValueError(f"pas de JSON dans la réponse : {text[:200]!r}")
+    start = min(found)
     end = max(text.rfind("}"), text.rfind("]")) + 1
     return json.loads(text[start:end])
 
