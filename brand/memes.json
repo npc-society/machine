@@ -1,0 +1,19 @@
+{
+ "_aide": "Par langue et par catégorie : 'stamps' = tampons de presse affichés au moment fort ; 'sfx' = bruitages (dossier assets/sfx) ; 'reactions' = tes mèmes de réaction (vidéos .mp4 ou images .png/.jpg de 1 à 2 s) à déposer dans assets/reactions/<langue>/. Mets les réactions à jour chaque semaine avec les références du moment sur TikTok et X.",
+ "fr": {
+  "rage":       {"stamps": ["CRISE DE NERFS", "LA MANETTE N'A PAS SURVÉCU", "IL CRAQUE EN DIRECT"], "sfx": ["boom", "wobble"], "reactions": []},
+  "fail":       {"stamps": ["DRAME", "FAIT DIVERS", "AUCUN SURVIVANT", "CATASTROPHE"], "sfx": ["boom", "wobble"], "reactions": []},
+  "incroyable": {"stamps": ["INCROYABLE", "DU JAMAIS VU", "LES EXPERTS SANS VOIX"], "sfx": ["whoosh", "ding"], "reactions": []},
+  "decouverte": {"stamps": ["RÉVÉLATION", "ROCKSTAR NOUS CACHE TOUT", "DOCUMENT EXCLUSIF"], "sfx": ["ding"], "reactions": []},
+  "course":     {"stamps": ["COURSE-POURSUITE", "LA POLICE DÉPASSÉE", "FUITE SPECTACULAIRE"], "sfx": ["whoosh"], "reactions": []},
+  "drole":      {"stamps": ["INSOLITE", "SCANDALE", "LES PNJ SOUS LE CHOC"], "sfx": ["boom", "ding"], "reactions": []}
+ },
+ "en": {
+  "rage":       {"stamps": ["MELTDOWN", "CONTROLLER DIDN'T SURVIVE", "HE SNAPPED ON STREAM"], "sfx": ["boom", "wobble"], "reactions": []},
+  "fail":       {"stamps": ["TRAGEDY", "NO SURVIVORS", "DISASTER", "CRIME SCENE"], "sfx": ["boom", "wobble"], "reactions": []},
+  "incroyable": {"stamps": ["UNBELIEVABLE", "NEVER SEEN BEFORE", "EXPERTS SPEECHLESS"], "sfx": ["whoosh", "ding"], "reactions": []},
+  "decouverte": {"stamps": ["REVEALED", "ROCKSTAR IS HIDING THIS", "LEAKED FILE"], "sfx": ["ding"], "reactions": []},
+  "course":     {"stamps": ["HIGH-SPEED CHASE", "COPS HUMILIATED", "GREAT ESCAPE"], "sfx": ["whoosh"], "reactions": []},
+  "drole":      {"stamps": ["BIZARRE", "SCANDAL", "NPCS IN SHOCK"], "sfx": ["boom", "ding"], "reactions": []}
+ }
+}

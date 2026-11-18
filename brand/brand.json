@@ -1,0 +1,19 @@
+{
+ "name": "NPC SOCIETY",
+ "tagline": {"fr": "LE QUOTIDIEN DES PNJ", "en": "THE NPC DAILY"},
+ "handle": {"fr": "@npcsociety.fr", "en": "@npcsociety"},
+ "colors": {"red": "E10600", "yellow": "FFD400", "black": "0E0E0E", "white": "FFFFFF"},
+ "kickers": {
+  "fr": ["EXCLUSIF", "CHOC", "RÉVÉLATIONS", "ON VOUS DIT TOUT", "DERNIÈRE MINUTE", "TÉMOIGNAGE"],
+  "en": ["EXCLUSIVE", "SHOCKING", "REVEALED", "BREAKING", "JUST IN", "WITNESS SPEAKS"]
+ },
+ "live": {"fr": "EN DIRECT", "en": "LIVE"},
+ "ticker": {
+  "fr": ["LA POLICE DE VICE CITY DÉBORDÉE", "LES PNJ RÉCLAMENT DES CONGÉS PAYÉS", "UN BUS RETROUVÉ DANS L'OCÉAN", "LES ASSURANCES DE LEONIDA AU BORD DE LA FAILLITE", "UN PIÉTON TÉMOIGNE : « JE N'AI RIEN VU VENIR »", "LES EXPERTS SONT FORMELS : PERSONNE NE SAIT CONDUIRE"],
+  "en": ["VICE CITY POLICE OVERWHELMED", "NPCS DEMAND PAID LEAVE", "BUS FOUND IN THE OCEAN", "LEONIDA INSURERS ON THE BRINK", "PEDESTRIAN SPEAKS: \"I NEVER SAW IT COMING\"", "EXPERTS AGREE: NOBODY CAN DRIVE"]
+ },
+ "hashtags": {
+  "fr": ["#GTA6", "#GTAVI", "#gaming", "#twitchfr", "#streamerfr", "#gta"],
+  "en": ["#GTA6", "#GTAVI", "#gaming", "#twitch", "#streamer", "#gta"]
+ }
+}
