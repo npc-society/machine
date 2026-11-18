@@ -65,6 +65,7 @@ DISCORD_MAX_MB = float(env("DISCORD_MAX_MB", "9.5"))  # limite d'upload Discord 
 # --- Textes optionnels générés par IA (sinon modèles de texte intégrés)
 ANTHROPIC_API_KEY = env("ANTHROPIC_API_KEY")
 ANTHROPIC_MODEL = env("ANTHROPIC_MODEL", "claude-haiku-5-5")
+AI_MAX_CALLS_PER_DAY = env_int("AI_MAX_CALLS_PER_DAY", 500)  # ~0,15 $ max par jour avec Haiku 5.5
 
 FLAGS = {"fr": "🇫🇷", "en": "🇬🇧", "es": "🇪🇸", "de": "🇩🇪", "pt": "🇧🇷", "it": "🇮🇹"}
 

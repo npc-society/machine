@@ -102,7 +102,24 @@ FOOT = {
 }
 
 
+USAGE_FILE = C.DATA / "ai_usage.json"
+
+
+def _count_call():
+    """Plafond quotidien d'appels IA (AI_MAX_CALLS_PER_DAY). Au-delà : modèles de texte gratuits."""
+    from datetime import date
+    usage = C.load_json(USAGE_FILE)
+    today = date.today().isoformat()
+    n = usage.get(today, 0)
+    if n >= C.AI_MAX_CALLS_PER_DAY:
+        raise RuntimeError(f"plafond quotidien atteint ({C.AI_MAX_CALLS_PER_DAY} appels IA)")
+    usage = {k: v for k, v in usage.items() if k >= today[:8]}  # on garde le mois en cours
+    usage[today] = n + 1
+    C.save_json(USAGE_FILE, usage)
+
+
 def _claude(prompt: str, max_tokens: int = 700) -> str:
+    _count_call()
     r = requests.post("https://api.anthropic.com/v1/messages", timeout=60, headers={
         "x-api-key": C.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json"},
         json={"model": C.ANTHROPIC_MODEL, "max_tokens": max_tokens,
