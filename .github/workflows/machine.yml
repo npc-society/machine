@@ -132,5 +132,6 @@ jobs:
           git config user.email "machine-a-clips@users.noreply.github.com"
           git add data/
           git diff --staged --quiet && exit 0
+          
           git commit -m "maj $(date -u +%Y-%m-%dT%H:%MZ)"
           for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
