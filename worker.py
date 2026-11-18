@@ -87,8 +87,10 @@ def check():
                         clip["cross"] = True
                         for l in other_langs(clip["lang"]):
                             enqueue(queue, clip["id"], l, db, censor=censor)
-                    if "compil" in picks:
+                    if "compil" in picks or "compil_censure" in picks:
                         clip["compil"] = True
+                    if "compil_censure" in picks:
+                        clip["censure"] = True
             m = by_mont.get(msg["id"])
             if m and m["status"] == "a_valider":
                 choice = D.user_choice(msg, D.VALIDATE)

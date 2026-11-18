@@ -530,8 +530,11 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
         if not a["gameplay"]:
             raise UnsafeClip(f"pas du gameplay GTA ({a['raison']})")
         if a["nudite"] and not nude:
-            raise UnsafeClip(f"nudité repérée par l'IA ({a['raison']})")
-        if not a["safe"]:
+            cam_early = cam_early or detect_facecam(src, info)
+            if not cam_early:
+                raise UnsafeClip(f"nudité repérée par l'IA, pas de facecam ({a['raison']})")
+            nude = [(0.0, round(info["dur"], 2))]  # version censurée automatique : réaction du streamer tout du long
+        if not a["safe"] and not a["nudite"]:
             raise UnsafeClip(f"contenu à risque ({a['raison']})")
         if a["score"] < C.AUTO_MIN_SCORE:
             raise UnsafeClip(f"pas assez drôle/intéressant : {a['score']}/10 ({a['raison']})")
@@ -590,7 +593,8 @@ def render_compilation(clips: list, title: str, work: Path, out_lang: str = None
     n = len(ordered)
     for i, clip in enumerate(ordered):
         try:
-            r = render_short(clip, work / clip["id"], target_mb=None, rank=n - i, out_lang=lang, strict=strict)
+            r = render_short(clip, work / clip["id"], target_mb=None, rank=n - i, out_lang=lang, strict=strict,
+                             force_censor=bool(clip.get("censure")))
             parts.append(r["path"])
         except Exception as e:
             print(f"⚠️ Clip ignoré ({clip['url']}) : {e}")
@@ -668,7 +672,8 @@ def render_flash(clips: list, title: str, work: Path, lang: str, target_mb=None)
             w.mkdir(parents=True, exist_ok=True)
             full = download(clip["url"], w / "full.mp4")
             short = trim_best(full, w / "best.mp4", C.FLASH_SECONDS)
-            r = render_short(clip, w, target_mb=None, src=short, out_lang=lang, brief=(i, n), strict=True)
+            r = render_short(clip, w, target_mb=None, src=short, out_lang=lang, brief=(i, n), strict=True,
+                             force_censor=bool(clip.get("censure")))
             parts.append(r["path"])
         except Exception as e:
             print(f"⚠️ Brève ignorée ({clip['url']}) : {e}")

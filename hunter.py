@@ -148,7 +148,7 @@ def clip_embed(c, now, rank_label=""):
         "image": {"url": c["thumbnail_url"]},
         "timestamp": c["created_at"],
         "color": TIER_COLOR[c["_tier"]],
-        "footer": {"text": "✅ short · 🔞 short censuré (nudité floutée, gros plan sur le streamer) · 🌍 autre langue · ⭐ compil · ❌ jeter"},
+        "footer": {"text": "✅ short · 🔞 short censuré · 🌍 autre langue · ⭐ compil · 🙈 compil censurée · ❌ jeter"},
     }
 
 
