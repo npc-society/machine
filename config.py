@@ -55,6 +55,7 @@ MAX_RENDERS_PER_RUN = env_int("MAX_RENDERS_PER_RUN", 10)
 AUTO_PER_RUN = env_int("AUTO_PER_RUN", 2)          # clips montés d'office à chaque repérage, par langue
 FLASH_SIZE = env_int("FLASH_SIZE", 3)              # nombre de brèves dans un flash info
 FLASH_SECONDS = env_int("FLASH_SECONDS", 15)       # durée de chaque brève
+SHORT_MAX_SECONDS = env_int("SHORT_MAX_SECONDS", 30)  # un clip plus long est recoupé autour du moment fort
 MIN_CLIP_SECONDS = env_int("MIN_CLIP_SECONDS", 15)  # en dessous : pas de short…
 SHORT_BUZZ_FACTOR = env_int("SHORT_BUZZ_FACTOR", 4)  # … sauf gros buzz (vues ≥ 4 × MIN_VIEWS)
 SHORT_BUZZ_RATIO = env_int("SHORT_BUZZ_RATIO", 4)    # … ou pépite qui explose (vues ≥ 4 × ses viewers)

@@ -16,8 +16,9 @@ import config as C
 from categorize import categorize
 
 W, H, FPS = 1080, 1920, 30
-CAM_Y, CAM_H = 400, 360          # bandeau facecam
-GAME_H = 608                     # le jeu en 16:9 sur toute la largeur
+CAM_Y, CAM_H = 390, 480          # bandeau facecam (format 9:4, le visage respire)
+GAME_H = 608                     # le jeu en 16:9 sur toute la largeur (mise en page facecam)
+GAME_H_FULL = 810                # sans facecam : jeu plus grand (recadré en 4:3), moins de vide
 LOGO_POS = (36, 48)
 _whisper = None
 
@@ -211,47 +212,71 @@ def _enable(intervals) -> str:
     return "+".join(f"between(t,{a},{b})" for a, b in intervals)
 
 
+def _face_detector(w, h):
+    """YuNet (réseau de neurones, bien meilleur sur les petites webcams) ; repli sur Haar si indisponible."""
+    import cv2
+    model = C.ASSETS / "models" / "face_detection_yunet_2023mar.onnx"
+    if model.exists() and hasattr(cv2, "FaceDetectorYN"):
+        det = cv2.FaceDetectorYN.create(str(model), "", (w, h), 0.6, 0.3, 50)
+
+        def find(img):
+            _, faces = det.detect(img)
+            return [(f[0], f[1], f[2], f[3]) for f in (faces if faces is not None else [])]
+        return find
+    cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+    if cascade.empty():
+        return None
+    return lambda img: list(cascade.detectMultiScale(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 1.1, 6,
+                                                     minSize=(int(w * 0.02), int(w * 0.02))))
+
+
 def detect_facecam(path: Path, info: dict):
-    """Cherche une facecam stable dans un coin. Renvoie (x, y, w, h) en pixels, ou None."""
+    """Cherche la webcam du streamer : un visage qui reste au même endroit d'une image à l'autre
+    (les visages du jeu, eux, bougent). Renvoie la zone à recadrer (x, y, w, h) en pixels, ou None."""
     try:
         import cv2
     except ImportError:
         return None
+    fw, fh = info["w"], info["h"]
     try:
-        cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-    except Exception:
+        find = _face_detector(fw, fh)
+    except Exception as e:
+        print(f"⚠️ Détecteur de visage indisponible : {e}")
         return None
-    if cascade.empty():
-        print("⚠️ Détecteur de visage indisponible : mise en page floutée")
+    if not find:
         return None
     cap = cv2.VideoCapture(str(path))
     total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) or 1
-    fw, fh = info["w"], info["h"]
-    hits, samples = [], 12
+    samples, hits = 14, []
     for k in range(samples):
         cap.set(cv2.CAP_PROP_POS_FRAMES, int(total * (k + 0.5) / samples))
         ok, frame = cap.read()
         if not ok:
             continue
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        for (x, y, w, h) in cascade.detectMultiScale(gray, 1.1, 6, minSize=(int(fw * 0.035), int(fw * 0.035))):
-            cx, cy = (x + w / 2) / fw, (y + h / 2) / fh
-            on_edge = cx < 0.33 or cx > 0.67 or cy < 0.3 or cy > 0.7
-            if on_edge and w < fw * 0.22:
-                hits.append((cx, cy, w / fw))
+        if frame.shape[1] != fw or frame.shape[0] != fh:
+            frame = cv2.resize(frame, (fw, fh))
+        for (x, y, w, h) in find(frame):
+            if w < fw * 0.25:  # une webcam incrustée, pas un gros plan plein écran
+                hits.append(((x + w / 2) / fw, (y + h / 2) / fh, w / fw, k))
     cap.release()
-    if len(hits) < samples * 0.5:
+    if not hits:
         return None
-    mx = sorted(h[0] for h in hits)[len(hits) // 2]
-    my = sorted(h[1] for h in hits)[len(hits) // 2]
-    close = [h for h in hits if abs(h[0] - mx) < 0.05 and abs(h[1] - my) < 0.05]
-    if len(close) < samples * 0.5:
+    best = None  # on cherche le visage le plus stable (présent sur le plus d'images au même endroit)
+    for cx, cy, _, _ in hits:
+        group = [h for h in hits if abs(h[0] - cx) < 0.035 and abs(h[1] - cy) < 0.035]
+        frames = len({h[3] for h in group})
+        if not best or frames > best[0]:
+            best = (frames, group)
+    frames, group = best
+    if frames < samples * 0.45:
         return None
-    face_w = sorted(h[2] for h in close)[len(close) // 2] * fw
-    cw = min(face_w * 4.2, fw * 0.55)
+    mx = sorted(h[0] for h in group)[len(group) // 2]
+    my = sorted(h[1] for h in group)[len(group) // 2]
+    face_w = sorted(h[2] for h in group)[len(group) // 2] * fw
+    cw = min(face_w * 4.4, fw * 0.6)
     ch = cw * CAM_H / W
     x = min(max(mx * fw - cw / 2, 0), fw - cw)
-    y = min(max(my * fh - ch / 2 + ch * 0.08, 0), fh - ch)
+    y = min(max(my * fh - ch * 0.45, 0), fh - ch)
     return tuple(int(v) // 2 * 2 for v in (x, y, cw, ch))
 
 
@@ -295,7 +320,11 @@ def _seed_pick(options, seed):
 
 
 def game_y(layout: str) -> int:
-    return CAM_Y + CAM_H + 20 if layout == "facecam" else 620
+    return CAM_Y + CAM_H + 16 if layout == "facecam" else 470
+
+
+def game_h(layout: str) -> int:
+    return GAME_H if layout == "facecam" else GAME_H_FULL
 
 
 def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, layout, rank=None, brief=None,
@@ -305,7 +334,8 @@ def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, la
     ev = []
     red, wht = _bgr(_col("red", "E10600")), "&H00FFFFFF"
     gy = game_y(layout)
-    bars = gy + GAME_H                      # les barres d'info sont collées sous le clip
+    gh = game_h(layout)
+    bars = gy + gh                          # les barres d'info sont collées sous le clip
 
     # Gros titre racoleur sous le logo (le logo est incrusté en image)
     hy = 172
@@ -316,7 +346,7 @@ def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, la
         ev.append(f"Dialogue: 6,0:00:00.00,{end},Kicker,,0,0,0,,{{\\an9\\pos({W - 36},52)}}{word} {brief[0]}/{brief[1]}")
     if rank is not None:
         ev.append(f"Dialogue: 6,0:00:00.00,{ts(min(dur, 3))},Rank,,0,0,0,,"
-                  f"{{\\pos(540,{gy + GAME_H // 2})\\fscx40\\fscy40\\t(0,160,\\fscx110\\fscy110)"
+                  f"{{\\pos(540,{gy + gh // 2})\\fscx40\\fscy40\\t(0,160,\\fscx110\\fscy110)"
                   f"\\t(160,260,\\fscx100\\fscy100)}}#{rank}")
 
     # Barre « en direct » + bandeau défilant, juste sous le clip
@@ -394,22 +424,23 @@ def encode(src: Path, out: Path, info, cam, peaks, ass_path, sfx: Path, sfx_at, 
           f"[a]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},boxblur=26:2,"
           f"eq=brightness=-0.18:saturation=0.75[bg]"]
     # Le jeu, zoomé aux moments forts (seulement le jeu, pas l'habillage)
-    game = f"[b]scale={W}:{GAME_H}:force_original_aspect_ratio=increase,crop={W}:{GAME_H},setsar=1,fps={FPS}"
+    GH = game_h(layout)
+    game = f"[b]scale={W}:{GH}:force_original_aspect_ratio=increase,crop={W}:{GH},setsar=1,fps={FPS}"
     if peaks:
         bumps = f"max(0,1-abs(it-{peaks[0]})/0.5)"
         game += (f",zoompan=z='1+0.06*{bumps}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
-                 f":s={W}x{GAME_H}:fps={FPS}")
+                 f":s={W}x{GH}:fps={FPS}")
     if censor:  # nudité : jeu fortement flouté sur ces passages
         game += f",boxblur=60:6:enable='{_enable(censor)}'"
     fg.append(game + "[game]")
     fg.append(f"[bg][game]overlay=0:{gy}[s1]")
     last = "s1"
-    if censor and cam:  # … et on montre la réaction du streamer en grand à la place
+    if False and censor and cam:  # (désactivé : la réaction est déjà en grand dans le bandeau facecam)
         x, y, cw, ch = cam
-        zw = min(int(ch * W / GAME_H) // 2 * 2, info["w"])
+        zw = min(int(ch * W / GH) // 2 * 2, info["w"])
         zx = min(max(x + cw // 2 - zw // 2, 0), info["w"] - zw)
-        fg.append(f"[d]crop={zw}:{ch}:{zx}:{y},scale={W}:{GAME_H}:force_original_aspect_ratio=increase,"
-                  f"crop={W}:{GAME_H},setsar=1[face]")
+        fg.append(f"[d]crop={zw}:{ch}:{zx}:{y},scale={W}:{GH}:force_original_aspect_ratio=increase,"
+                  f"crop={W}:{GH},setsar=1[face]")
         fg.append(f"[{last}][face]overlay=0:{gy}:enable='{_enable(censor)}'[s1b]")
         last = "s1b"
     else:
@@ -442,7 +473,7 @@ def encode(src: Path, out: Path, info, cam, peaks, ass_path, sfx: Path, sfx_at, 
         r_at = min(r_at, max(dur - r_dur, 0))
         ri = len(inputs) - 1
         fg.append(f"[{ri}:v]scale=380:-2,pad=iw+12:ih+12:6:6:white,setpts=PTS-STARTPTS+{r_at}/TB[rx]")
-        fg.append(f"[{last}][rx]overlay=W-w-24:{gy + GAME_H}-h-24:enable='between(t,{r_at},{r_at + r_dur})'"
+        fg.append(f"[{last}][rx]overlay=W-w-24:{gy + GH}-h-24:enable='between(t,{r_at},{r_at + r_dur})'"
                   f":eof_action=pass[s3]")
         last = "s3"
     logo = C.ASSETS / "brand" / "logo_bug.png"
@@ -498,6 +529,9 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
     work.mkdir(parents=True, exist_ok=True)
     src = src or download(clip["url"], work / f"{clip['id']}_src.mp4")
     info = probe(src)
+    if info["dur"] > C.SHORT_MAX_SECONDS + 5 and not brief:  # clip long : on garde le meilleur passage
+        src = trim_best(src, work / "best.mp4", C.SHORT_MAX_SECONDS)
+        info = probe(src)
     if force_censor:  # 🔞 : tu as signalé de la nudité → détection plus sensible, et jamais d'écart automatique
         nude, nude_ratio = nsfw_timeline(src, work, threshold=0.25)
         cam_early = detect_facecam(src, info)
