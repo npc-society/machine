@@ -128,12 +128,19 @@ def _count_call():
     C.save_json(USAGE_FILE, usage)
 
 
-def _claude(prompt: str, max_tokens: int = 700) -> str:
+def _claude(prompt: str, max_tokens: int = 700, images=None) -> str:
+    """Appel au modèle. images = liste de chemins .jpg (le modèle « voit » le clip)."""
+    import base64
     _count_call()
-    r = requests.post("https://api.anthropic.com/v1/messages", timeout=60, headers={
+    content = []
+    for p in images or []:
+        content.append({"type": "image", "source": {"type": "base64", "media_type": "image/jpeg",
+                                                     "data": base64.b64encode(open(p, "rb").read()).decode()}})
+    content.append({"type": "text", "text": prompt})
+    r = requests.post("https://api.anthropic.com/v1/messages", timeout=90, headers={
         "x-api-key": C.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json"},
         json={"model": C.ANTHROPIC_MODEL, "max_tokens": max_tokens,
-              "messages": [{"role": "user", "content": prompt}]})
+              "messages": [{"role": "user", "content": content}]})
     r.raise_for_status()
     return r.json()["content"][0]["text"]
 
@@ -165,37 +172,54 @@ def _template(clip, category, seed, lang):
             "caption": _caption(clip, lang, title, category)}
 
 
-def _ai(clip, category, transcript, lang):
+def _ai(clip, category, transcript, lang, frames=None):
     lang_name = {"fr": "français", "en": "English", "es": "español"}.get(lang, lang)
+    known = is_known(clip)
+    example = {"fr": "UN JOUEUR VOLE UN AVION ET FINIT DANS L'OCÉAN",
+               "en": "PLAYER STEALS A PLANE, ENDS UP IN THE OCEAN",
+               "es": "UN JUGADOR ROBA UN AVIÓN Y ACABA EN EL MAR"}.get(lang, "")
     prompt = (
-        "Tu écris pour NPC Society, une page TikTok/Instagram qui reprend les moments marquants des streamers sur "
-        "GTA 6, avec un habillage de chaîne d'info légèrement satirique. "
-        f"Écris en {lang_name}. Streamer : {clip['streamer']}. Catégorie : {category}. "
-        f"Titre du clip sur Twitch : « {clip['title']} ». Ce qui se dit dans le clip : « {transcript[:1500]} ».\n"
-        "Donne :\n"
-        "- headline : titre en MAJUSCULES, 5 à 10 mots, qui dit clairement CE QUI SE PASSE dans le clip (on doit "
-        "comprendre le sujet sans le son) et donne envie de regarder jusqu'au bout. Ton taquin, un peu moqueur ;\n"
-        + ("  Le streamer est connu : tu peux citer son nom.\n" if is_known(clip) else
-           "  Le streamer est peu connu : ne mets PAS son nom dans le titre ; décris l'action de façon accrocheuse, "
-           "comme un titre de média (« UN JOUEUR VOLE UN AVION ET FINIT DANS L'OCÉAN »).\n") +
-        "- ticker : 2 courts commentaires ironiques en MAJUSCULES (6 à 10 mots) sur l'action précise du clip ;\n"
+        "Tu travailles pour NPC Society, une page TikTok/Instagram qui reprend les moments marquants de streamers "
+        "sur GTA 6, avec un habillage de chaîne d'info légèrement satirique.\n"
+        f"Les images jointes viennent du clip, dans l'ordre. Streamer : {clip['streamer']} "
+        f"({'connu' if known else 'peu connu'}). Titre du clip sur Twitch : « {clip['title']} ». "
+        f"Catégorie devinée : {category}. Ce qui se dit : « {transcript[:1500] or '(rien de clair)'} ».\n\n"
+        "1) ANALYSE (sois strict) :\n"
+        "- gameplay : true seulement si les images montrent bien le jeu GTA en train d'être joué. false si c'est "
+        "surtout autre chose (vidéo YouTube regardée en réaction, film, IRL, écran d'attente, menu, discussion "
+        "face caméra sans jeu).\n"
+        "- nudite : true si on voit de la nudité ou un contenu sexuel, même dans le jeu.\n"
+        "- safe : false si propos haineux, harcèlement, contenu sexuel explicite, infos personnelles, vraie mise en danger.\n"
+        "- score : de 1 à 10, à quel point le clip est drôle OU intéressant pour quelqu'un qui scrolle "
+        "(1-4 = banal ou incompréhensible sans contexte).\n"
+        f"2) TEXTES en {lang_name} :\n"
+        "- headline : titre en MAJUSCULES, 6 à 11 mots, façon titre de média accrocheur, qui DÉCRIT L'ACTION visible "
+        "(qui fait quoi, avec quoi, où, et ce qui tourne mal ou bien), pour qu'on comprenne le sujet sans le son. "
+        "L'action passe avant le streamer : "
+        + (f"tu peux citer {clip['streamer']} si ça aide, mais l'action doit être claire. " if known else
+           f"ne cite PAS le pseudo, dis « un joueur » ou décris le personnage (exemple : « {example} »). ") +
+        "Ton taquin, un peu moqueur ;\n"
+        "- ticker : 2 courts commentaires ironiques en MAJUSCULES (6 à 10 mots) sur l'action précise ;\n"
         "- title : le titre réécrit normalement avec 1 emoji, pour la légende.\n"
-        "Règles strictes : jamais insultant ni humiliant pour le streamer ; jamais trompeur (n'invente pas de fait, "
-        "de chiffre, de drame ou de citation qui ne sont pas dans le clip) ; pas de politique ; pas de vrai média cité. "
-        "Si le contenu du clip est flou, reste général plutôt que d'inventer. "
-        "Réponds uniquement en JSON : {\"headline\": \"\", \"ticker\": [\"\", \"\"], \"title\": \"\"}"
+        "Règles : jamais insultant ni humiliant ; jamais trompeur (n'invente ni fait, ni chiffre, ni citation absents "
+        "du clip) ; pas de politique ; pas de vrai média cité. Si l'action est floue, reste général.\n"
+        "Réponds uniquement en JSON : {\"gameplay\": true, \"nudite\": false, \"safe\": true, \"score\": 7, "
+        "\"raison\": \"...\", \"headline\": \"\", \"ticker\": [\"\", \"\"], \"title\": \"\"}"
     )
-    d = _json(_claude(prompt))
+    d = _json(_claude(prompt, 700, images=frames))
+    analysis = {"gameplay": bool(d.get("gameplay", True)), "nudite": bool(d.get("nudite", False)),
+                "safe": bool(d.get("safe", True)), "score": int(d.get("score", 5)), "raison": d.get("raison", "")}
     return {"headline": d["headline"], "ticker": d["ticker"][:3], "title": d["title"],
-            "caption": _caption(clip, lang, d["title"], category)}
+            "caption": _caption(clip, lang, d["title"], category), "analysis": analysis}
 
 
-def describe(clip, category, transcript="", seed=None, lang=None):
+def describe(clip, category, transcript="", seed=None, lang=None, frames=None):
+    """Titres + analyse du clip (images + transcription). Sans clé IA : modèles de texte, pas d'analyse."""
     seed = seed or clip["id"]
     lang = lang or clip["lang"]
     if C.ANTHROPIC_API_KEY:
         try:
-            return _ai(clip, category, transcript, lang)
+            return _ai(clip, category, transcript, lang, frames)
         except Exception as e:
             print(f"⚠️ IA indisponible, modèle de texte utilisé : {e}")
     return _template(clip, category, seed, lang)

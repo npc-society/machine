@@ -132,7 +132,26 @@ def audio_peaks(path: Path, dur: float, max_peaks: int = 3) -> list:
 
 
 class UnsafeClip(Exception):
-    """Clip écarté automatiquement (nudité détectée)."""
+    """Clip écarté automatiquement (nudité, hors jeu, sans intérêt)."""
+
+
+def sample_frames(src: Path, work: Path, dur: float, n: int = 4, peak=None) -> list:
+    """Quelques images du clip (petites) pour que l'IA « voie » ce qui se passe."""
+    fdir = work / "ia"
+    fdir.mkdir(parents=True, exist_ok=True)
+    times = [dur * (k + 0.5) / n for k in range(n)]
+    if peak is not None:
+        times[-1] = min(peak + 0.3, dur - 0.1)
+    out = []
+    for k, t in enumerate(sorted(times)):
+        p = fdir / f"i{k}.jpg"
+        try:
+            run(["ffmpeg", "-y", "-v", "error", "-ss", f"{t:.2f}", "-i", str(src), "-frames:v", "1",
+                 "-vf", "scale=640:-2", "-q:v", "5", str(p)])
+            out.append(p)
+        except RuntimeError:
+            pass
+    return out
 
 
 NSFW_CLASSES = {"FEMALE_BREAST_EXPOSED", "FEMALE_GENITALIA_EXPOSED", "MALE_GENITALIA_EXPOSED",
@@ -467,7 +486,8 @@ def encode(src: Path, out: Path, info, cam, peaks, ass_path, sfx: Path, sfx_at, 
 
 
 def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = None, out_lang=None,
-                 brief=None) -> dict:
+                 brief=None, strict=False) -> dict:
+    """strict=True (montages automatiques, flashs, compils) : on écarte les clips hors jeu, douteux ou sans intérêt."""
     """Monte un clip. out_lang = langue de la chaîne cible (sous-titres traduits si elle diffère du clip)."""
     import texts
     lang = clip["lang"]
@@ -494,8 +514,19 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
             print(f"⚠️ Pas de traduction {lang}→{out_lang} : sous-titres d'origine conservés")
     category = categorize(clip["title"], transcript)
     seed = clip["id"] + out_lang + str(clip.get("reroll", 0))
-    txt = texts.describe(clip, category, transcript, seed=seed, lang=out_lang)
     peaks = audio_peaks(src, info["dur"]) if info["audio"] else []
+    frames = sample_frames(src, work, info["dur"], peak=peaks[0] if peaks else None) if C.ANTHROPIC_API_KEY else []
+    txt = texts.describe(clip, category, transcript, seed=seed, lang=out_lang, frames=frames)
+    a = txt.get("analysis")
+    if a and strict:
+        if not a["gameplay"]:
+            raise UnsafeClip(f"pas du gameplay GTA ({a['raison']})")
+        if a["nudite"] and not nude:
+            raise UnsafeClip(f"nudité repérée par l'IA ({a['raison']})")
+        if not a["safe"]:
+            raise UnsafeClip(f"contenu à risque ({a['raison']})")
+        if a["score"] < C.AUTO_MIN_SCORE:
+            raise UnsafeClip(f"pas assez drôle/intéressant : {a['score']}/10 ({a['raison']})")
     cam = cam_early if nude else detect_facecam(src, info)
     layout = "facecam" if cam else "flou"
     meme = pick_meme(out_lang, category, seed)
@@ -514,7 +545,7 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
     encode(src, out, info, cam, peaks, ass_path, sfx, peak, target_mb, meme["reaction"], censor=nude)
     return {"path": out, "category": category, "transcript": transcript, "meme": meme, "texts": txt,
             "layout": layout, "duration": info["dur"], "source": src, "lang": out_lang,
-            "translated": translated, "censored": nude}
+            "translated": translated, "censored": nude, "analysis": a}
 
 
 def render_intro(title: str, lang: str, work: Path, seconds: float = 2.4) -> Path:
@@ -542,7 +573,7 @@ def render_intro(title: str, lang: str, work: Path, seconds: float = 2.4) -> Pat
     return out
 
 
-def render_compilation(clips: list, title: str, work: Path, out_lang: str = None) -> Path:
+def render_compilation(clips: list, title: str, work: Path, out_lang: str = None, strict=False) -> Path:
     """Top N en compte à rebours : #N ... #1 (le plus vu en dernier)."""
     work.mkdir(parents=True, exist_ok=True)
     ordered = sorted(clips, key=lambda c: c.get("views", 0))
@@ -551,7 +582,7 @@ def render_compilation(clips: list, title: str, work: Path, out_lang: str = None
     n = len(ordered)
     for i, clip in enumerate(ordered):
         try:
-            r = render_short(clip, work / clip["id"], target_mb=None, rank=n - i, out_lang=lang)
+            r = render_short(clip, work / clip["id"], target_mb=None, rank=n - i, out_lang=lang, strict=strict)
             parts.append(r["path"])
         except Exception as e:
             print(f"⚠️ Clip ignoré ({clip['url']}) : {e}")
@@ -629,7 +660,7 @@ def render_flash(clips: list, title: str, work: Path, lang: str, target_mb=None)
             w.mkdir(parents=True, exist_ok=True)
             full = download(clip["url"], w / "full.mp4")
             short = trim_best(full, w / "best.mp4", C.FLASH_SECONDS)
-            r = render_short(clip, w, target_mb=None, src=short, out_lang=lang, brief=(i, n))
+            r = render_short(clip, w, target_mb=None, src=short, out_lang=lang, brief=(i, n), strict=True)
             parts.append(r["path"])
         except Exception as e:
             print(f"⚠️ Brève ignorée ({clip['url']}) : {e}")

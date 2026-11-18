@@ -118,22 +118,25 @@ def render():
         out_lang = item["lang"]
         work = C.OUT / f"{clip['id']}_{out_lang}"
         try:
-            r = montage.render_short(clip, work, target_mb=C.DISCORD_MAX_MB, out_lang=out_lang)
+            r = montage.render_short(clip, work, target_mb=C.DISCORD_MAX_MB, out_lang=out_lang,
+                                     strict=bool(item.get("auto")))
             txt = r["texts"]
-            if item.get("auto"):  # tri automatique : on ne garde que les clips drôles ou intéressants
-                note = texts.rate_clip(clip, r["transcript"], r["category"])
-                if note and (note["score"] < C.AUTO_MIN_SCORE or not note["safe"]):
-                    print(f"[auto] écarté {clip['url']} : {note}")
-                    clip["auto_ecarte"] = note
-                    done.append(item)
-                    continue
+            a = r.get("analysis") or {}
+            warn = ""
+            if a and not a.get("gameplay", True):
+                warn += "⚠️ L'IA pense que ce n'est pas du gameplay GTA\n"
+            if a and (a.get("nudite") or not a.get("safe", True)):
+                warn += f"⚠️ À vérifier avant de poster : {a.get('raison', '')}\n"
+            if r.get("censored"):
+                warn += "🔞 Passages masqués (nudité) : vérifie avant de poster\n"
             ch = C.channel("MONTAGES", out_lang)
             cross = f"🌍 Clip {clip['lang'].upper()} sous-titré en {out_lang.upper()}\n" if out_lang != clip["lang"] else ""
             if out_lang != clip["lang"] and not r["translated"]:
                 cross += "⚠️ Traduction indisponible (ajoute la clé ANTHROPIC_API_KEY)\n"
             reaction = Path(r["meme"]["reaction"]).name if r["meme"].get("reaction") else "-"
-            content = (f"{cross}**{txt['title']}**\n```\n{txt['caption']}\n```"
-                       f"Tampon : {r['meme'].get('stamp') or '-'} · réaction : {reaction} · mise en page : {r['layout']}\n"
+            score = f" · note IA {a['score']}/10" if a else ""
+            content = (f"{warn}{cross}**{txt['title']}**\n```\n{txt['caption']}\n```"
+                       f"Réaction : {reaction} · mise en page : {r['layout']}{score}\n"
                        f"✅ valider · 🔁 refaire · ❌ jeter")
             msg = D.send(ch, content, file=r["path"]) if ch else None
             if msg:
@@ -147,12 +150,13 @@ def render():
                 clip["rendered"].append(out_lang)
             done.append(item)
         except montage.UnsafeClip as e:
-            print(f"🔞 Écarté {clip['url']} : {e}")
-            clip["status"] = "bloque"
-            clip["bloque"] = str(e)
+            print(f"🚫 Écarté {clip['url']} : {e}")
+            clip["auto_ecarte" if item.get("auto") else "bloque"] = str(e)
+            if not item.get("auto"):
+                clip["status"] = "bloque"
             ch = C.channel("MONTAGES", out_lang)
             if ch and not item.get("auto"):
-                D.send(ch, f"🔞 Clip écarté automatiquement ({e}) : {clip['title']} — {clip['streamer']}")
+                D.send(ch, f"🚫 Clip écarté automatiquement ({e}) : {clip['title']} — {clip['streamer']}")
             done.append(item)
         except Exception as e:
             print(f"⚠️ Échec du montage {clip['url']} ({out_lang}) : {e}")
@@ -180,7 +184,7 @@ def compil(lang):
     title = {"fr": f"TOP {len(picks)} DE LA SEMAINE", "en": f"TOP {len(picks)} OF THE WEEK",
              "es": f"TOP {len(picks)} DE LA SEMANA"}.get(lang, f"TOP {len(picks)}")
     work = C.OUT / f"compil_{lang}"
-    path = montage.render_compilation(picks, title, work, out_lang=lang)
+    path = montage.render_compilation(picks, title, work, out_lang=lang)  # tes ⭐ : pas de filtre de note
     tag = f"compil-{lang}-{datetime.now(timezone.utc):%Y%m%d-%H%M}"
     link = ""
     try:  # trop lourde pour Discord : déposée dans les Releases GitHub
@@ -278,7 +282,7 @@ def theme(lang, keywords, title, days=7):
         if ch:
             D.send(ch, msg)
         return
-    path = montage.render_compilation(picks, title, C.OUT / f"theme_{lang}", out_lang=lang)
+    path = montage.render_compilation(picks, title, C.OUT / f"theme_{lang}", out_lang=lang, strict=True)
     credits = ", ".join(c["streamer"] for c in picks)
     publish_video(path, lang, f"🎬 **{title}** ({len(picks)} streamers) · Crédits : {credits}", "theme")
 
