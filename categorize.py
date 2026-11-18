@@ -3,7 +3,7 @@ import re
 import unicodedata
 
 CATEGORIES = {
-    "rage": {"emoji": "😡", "label": {"fr": "Rage", "en": "Rage"}},
+    "rage": {"emoji": "😡", "label": {"fr": "Rage", "en": "Rage", "es": "Rabia"}},
     "fail": {"emoji": "💥", "label": {"fr": "Fail", "en": "Fail"}},
     "incroyable": {"emoji": "🤯", "label": {"fr": "Incroyable", "en": "Insane"}},
     "decouverte": {"emoji": "🔍", "label": {"fr": "Découverte", "en": "Discovery"}},
@@ -12,17 +12,17 @@ CATEGORIES = {
 }
 
 KEYWORDS = {
-    "rage": ["rage", "tilt", "enerve", "colere", "crie", "hurle", "pete un cable", "ragequit", "mad",
+    "rage": ["enfadado", "grita", "se enoja", "furioso", "rage", "tilt", "enerve", "colere", "crie", "hurle", "pete un cable", "ragequit", "mad",
              "angry", "furious", "screams", "screaming", "lost it", "malaise", "insulte", "pourquoi"],
-    "fail": ["fail", "rate", "foire", "crash", "accident", "chute", "tombe", "explose", "boulette", "erreur",
+    "fail": ["choca", "falla", "se cae", "muere", "accidente", "fail", "rate", "foire", "crash", "accident", "chute", "tombe", "explose", "boulette", "erreur",
              "oups", "oops", "bug", "glitch", "wasted", "mort", "dies", "died", "trolled", "rip", "nul"],
-    "incroyable": ["incroyable", "dingue", "dinguerie", "insane", "clutch", "wtf", "fou", "folie", "impossible",
+    "incroyable": ["increible", "brutal", "locura", "imposible", "incroyable", "dingue", "dinguerie", "insane", "clutch", "wtf", "fou", "folie", "impossible",
                    "crazy", "unreal", "goat", "jamais vu", "never seen", "masterclass", "cascade", "stunt"],
-    "decouverte": ["secret", "easter egg", "cache", "decouvre", "decouverte", "found", "hidden", "discover",
+    "decouverte": ["secreto", "oculto", "descubre", "secret", "easter egg", "cache", "decouvre", "decouverte", "found", "hidden", "discover",
                    "detail", "details", "reference", "map", "lieu", "location"],
-    "course": ["course", "poursuite", "police", "flic", "flics", "chase", "race", "cops", "fuite", "escape",
+    "course": ["persecucion", "policia", "carrera", "huye", "course", "poursuite", "police", "flic", "flics", "chase", "race", "cops", "fuite", "escape",
                "braquage", "heist", "etoiles", "stars", "wanted"],
-    "drole": ["mdr", "ptdr", "lol", "lmao", "drole", "funny", "rire", "laugh", "pnj", "npc", "hilarious",
+    "drole": ["jaja", "jajaja", "xd", "risa", "gracioso", "mdr", "ptdr", "lol", "lmao", "drole", "funny", "rire", "laugh", "pnj", "npc", "hilarious",
               "kekw", "omegalul", "jpp", "😂", "💀"],
 }
 

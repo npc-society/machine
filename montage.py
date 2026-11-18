@@ -246,7 +246,7 @@ def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, la
     crawl = "   ●   ".join(ass_text(x) for x in (lines + extra[:2])) or ass_text(b.get("name", ""))
     width = int(len(crawl) * 19)
     speed = 210
-    label = "DERNIÈRE MINUTE" if lang == "fr" else "BREAKING NEWS"
+    label = {"fr": "DERNIÈRE MINUTE", "es": "ÚLTIMA HORA"}.get(lang, "BREAKING NEWS")
     ev.append(f"Dialogue: 4,0:00:00.00,{end},Ticker,,0,0,0,,{{\\q2\\move({W + 20},{band_y + 38},{-width},"
               f"{band_y + 38},0,{int((W + width) / speed * 1000)})}}{crawl}")
     ev.append(f"Dialogue: 6,0:00:00.00,{end},TickLbl,,0,0,0,,{{\\pos(14,{band_y + 38})}}{label}")
@@ -430,7 +430,7 @@ def render_intro(title: str, lang: str, work: Path, seconds: float = 2.4) -> Pat
     """Générique « édition spéciale » pour ouvrir les compilations."""
     ass = work / "intro.ass"
     blk = _col("black", "0E0E0E")
-    edition = "ÉDITION SPÉCIALE" if lang == "fr" else "SPECIAL REPORT"
+    edition = {"fr": "ÉDITION SPÉCIALE", "es": "EDICIÓN ESPECIAL"}.get(lang, "SPECIAL REPORT")
     ev = [
         f"Dialogue: 2,0:00:00.30,{ts(seconds)},Kicker,,0,0,0,,{{\\an8\\pos(540,900)}}{edition}",
         f"Dialogue: 2,0:00:00.45,{ts(seconds)},Head,,0,0,0,,{{\\an8\\pos(540,1010)\\fscx70\\fscy70"

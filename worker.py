@@ -144,7 +144,8 @@ def compil(lang):
     if len(picks) < 3:
         print(f"[{lang}] pas assez de clips ⭐ pour une compilation ({len(picks)})")
         return
-    title = {"fr": f"TOP {len(picks)} DE LA SEMAINE", "en": f"TOP {len(picks)} OF THE WEEK"}.get(lang, "TOP")
+    title = {"fr": f"TOP {len(picks)} DE LA SEMAINE", "en": f"TOP {len(picks)} OF THE WEEK",
+             "es": f"TOP {len(picks)} DE LA SEMANA"}.get(lang, f"TOP {len(picks)}")
     work = C.OUT / f"compil_{lang}"
     path = montage.render_compilation(picks, title, work, out_lang=lang)
     tag = f"compil-{lang}-{datetime.now(timezone.utc):%Y%m%d-%H%M}"

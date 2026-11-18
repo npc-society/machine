@@ -13,6 +13,20 @@ import config as C
 from categorize import CATEGORIES
 
 HEADLINES = {
+    "es": {
+        "rage": ["UN STREAMER PIERDE LOS NERVIOS EN DIRECTO", "{s} EXPLOTA: LOS VECINOS LO OYERON TODO",
+                 "CRISIS DE NERVIOS EN VICE CITY: {s} ROMPE SU SILENCIO"],
+        "fail": ["ROBA UN COCHE Y SE ARREPIENTE AL INSTANTE", "{s}: LA TRAGEDIA QUE NADIE VIO VENIR",
+                 "NO VAS A CREER LO QUE HIZO {s}"],
+        "incroyable": ["{s} LOGRA LO IMPOSIBLE, LOS EXPERTOS SIN PALABRAS", "LO QUE HIZO {s} TE VA A IMPACTAR",
+                       "LOS NPC TODAVÍA NO SE LO CREEN"],
+        "decouverte": ["LO QUE ROCKSTAR NO QUERÍA QUE SUPIERAS", "{s} DESCUBRE UN SECRETO DE GTA 6",
+                       "REVELADO: EL DETALLE QUE LO CAMBIA TODO"],
+        "course": ["PERSECUCIÓN: LA POLICÍA DE VICE CITY HUMILLADA", "{s} DEJA ATRÁS A LA POLICÍA",
+                   "FUGA ESPECTACULAR: UN TESTIGO LO CUENTA"],
+        "drole": ["INSÓLITO: {s} DEJA EN SHOCK A VICE CITY", "ESCÁNDALO: LOS NPC DENUNCIAN A {s}",
+                  "TODO SOBRE EL INCIDENTE DE {s}"],
+    },
     "fr": {
         "rage": ["UN STREAMER PERD LES PÉDALES EN DIRECT", "{s} CRAQUE : LES VOISINS ONT TOUT ENTENDU",
                  "CRISE DE NERFS À VICE CITY : {s} SORT DU SILENCE"],
@@ -45,6 +59,16 @@ HEADLINES = {
 
 # Commentaires moqueurs du bandeau défilant (utilisés sans clé IA)
 TICKERS = {
+    "es": {
+        "rage": ["{s} ASEGURA QUE ESTÁ «MUY TRANQUILO»", "EL MANDO PRESENTA UNA DENUNCIA", "LOS VECINOS PIDEN SILENCIO"],
+        "fail": ["{s} LO TENÍA «TODO CALCULADO»", "LAS ASEGURADORAS NO HACEN COMENTARIOS",
+                 "UN NPC DECLARA: «VINO DIRECTO HACIA MÍ»"],
+        "incroyable": ["LOS NPC PIDEN LA REPETICIÓN", "{s} AÚN NO HA EXPLICADO CÓMO", "LOS FÍSICOS DE LEONIDA, PERPLEJOS"],
+        "decouverte": ["ROCKSTAR NO QUISO RESPONDER", "{s} SIGUE HUMILDE TRAS SU DESCUBRIMIENTO", "LAS TEORÍAS SE DISPARAN"],
+        "course": ["LA POLICÍA DE VICE CITY PIDE REFUERZOS", "{s} SIGUE IGNORANDO EL CÓDIGO DE CIRCULACIÓN",
+                   "NINGÚN SEMÁFORO FUE RESPETADO"],
+        "drole": ["{s} NIEGA TODA RESPONSABILIDAD", "LOS NPC EN SHOCK", "SE HA ABIERTO UN GABINETE PSICOLÓGICO"],
+    },
     "fr": {
         "rage": ["{s} ASSURE QU'IL EST « TRÈS CALME »", "LA MANETTE PORTE PLAINTE", "LES VOISINS DEMANDENT LE SILENCE"],
         "fail": ["{s} AVAIT POURTANT « TOUT CALCULÉ »", "LES ASSURANCES REFUSENT DE COMMENTER",
@@ -69,6 +93,8 @@ TICKERS = {
 }
 
 FOOT = {
+    "es": {"credit": "🎥 {s} — twitch.tv/{l} (pásate a apoyarle)",
+           "cta": "📰 Síguenos: NPC Society cubre todos los sucesos de GTA 6."},
     "fr": {"credit": "🎥 {s} — twitch.tv/{l} (allez le soutenir)",
            "cta": "📰 Abonne-toi : NPC Society couvre tous les faits divers de GTA 6."},
     "en": {"credit": "🎥 {s} — twitch.tv/{l} (go support them)",
@@ -112,7 +138,7 @@ def _template(clip, category, seed, lang):
 
 
 def _ai(clip, category, transcript, lang):
-    lang_name = {"fr": "français", "en": "English"}.get(lang, lang)
+    lang_name = {"fr": "français", "en": "English", "es": "español"}.get(lang, lang)
     prompt = (
         "Tu écris pour NPC Society, une page TikTok/Instagram qui parodie les chaînes d'info et la presse à "
         "scandale : chaque moment de streamer sur GTA 6 est traité comme un fait divers. "

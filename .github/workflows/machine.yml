@@ -28,6 +28,8 @@ env:
   DISCORD_CLIPS_EN: ${{ secrets.DISCORD_CLIPS_EN }}
   DISCORD_MONTAGES_FR: ${{ secrets.DISCORD_MONTAGES_FR }}
   DISCORD_MONTAGES_EN: ${{ secrets.DISCORD_MONTAGES_EN }}
+  DISCORD_CLIPS_ES: ${{ secrets.DISCORD_CLIPS_ES }}
+  DISCORD_MONTAGES_ES: ${{ secrets.DISCORD_MONTAGES_ES }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
   GAME_NAMES: ${{ vars.GAME_NAMES || 'Grand Theft Auto VI' }}
   LANGS: ${{ vars.LANGS || 'fr,en' }}
