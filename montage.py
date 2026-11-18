@@ -136,8 +136,8 @@ class UnsafeClip(Exception):
     """Clip écarté automatiquement (nudité, hors jeu, sans intérêt)."""
 
 
-def sample_frames(src: Path, work: Path, dur: float, n: int = 4, peak=None) -> list:
-    """Quelques images du clip (petites) pour que l'IA « voie » ce qui se passe."""
+def sample_frames(src: Path, work: Path, dur: float, n: int = 6, peak=None) -> list:
+    """Quelques images du clip (petites) pour que l'IA « voie » ce qui se passe. Liste de (chemin, seconde)."""
     fdir = work / "ia"
     fdir.mkdir(parents=True, exist_ok=True)
     times = [dur * (k + 0.5) / n for k in range(n)]
@@ -149,7 +149,7 @@ def sample_frames(src: Path, work: Path, dur: float, n: int = 4, peak=None) -> l
         try:
             run(["ffmpeg", "-y", "-v", "error", "-ss", f"{t:.2f}", "-i", str(src), "-frames:v", "1",
                  "-vf", "scale=640:-2", "-q:v", "5", str(p)])
-            out.append(p)
+            out.append((p, round(t, 1)))
         except RuntimeError:
             pass
     return out
@@ -339,7 +339,9 @@ def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, la
 
     # Gros titre racoleur sous le logo (le logo est incrusté en image)
     hy = 172
-    ev.append(f"Dialogue: 5,0:00:00.05,{end},Head,,0,0,0,,{{\\move(-1100,{hy},36,{hy},0,220)}}"
+    hl = len(txt["headline"])
+    hfs = 104 if hl <= 34 else 92 if hl <= 48 else 80   # titre long : police réduite pour rester sur 2-3 lignes
+    ev.append(f"Dialogue: 5,0:00:00.05,{end},Head,,0,0,0,,{{\\fs{hfs}\\move(-1100,{hy},36,{hy},0,220)}}"
               f"{ass_text(txt['headline'])}")
     if brief:  # flash info : « BRÈVE 2/4 » en haut à droite
         word = {"fr": "BRÈVE", "es": "BREVE"}.get(lang, "BRIEF")
@@ -535,10 +537,6 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
     if force_censor:  # 🔞 : tu as signalé de la nudité → détection plus sensible, et jamais d'écart automatique
         nude, nude_ratio = nsfw_timeline(src, work, threshold=0.25)
         cam_early = detect_facecam(src, info)
-        if not nude:
-            if not cam_early:
-                raise UnsafeClip("🔞 demandé mais pas de facecam pour la version censurée")
-            nude = [(0.0, round(info["dur"], 2))]  # rien de repéré : on montre la réaction du streamer tout du long
     else:
         nude, nude_ratio = nsfw_timeline(src, work)
         cam_early = detect_facecam(src, info) if nude else None
@@ -565,15 +563,26 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
     a = txt.get("analysis")
     if a and a.get("categorie"):
         category = a["categorie"]
+    # Nudité vue par l'IA mais pas par NudeNet : on floute seulement autour des images concernées (le reste garde
+    # tout son contexte). Tout le clip seulement en dernier recours, si tu as demandé 🔞 et que rien n'est localisé.
+    if not nude and ((a and a.get("nudite")) or force_censor):
+        times = [frames[i - 1][1] for i in (a or {}).get("nudite_images", []) if 1 <= i <= len(frames)]
+        for t in sorted(times):
+            s0, s1 = max(t - 2.5, 0), min(t + 2.5, info["dur"])
+            if nude and s0 <= nude[-1][1]:
+                nude[-1] = (nude[-1][0], s1)
+            else:
+                nude.append((round(s0, 2), round(s1, 2)))
+        if not nude and force_censor:
+            nude = [(0.0, round(info["dur"], 2))]
+        if nude:
+            cam_early = cam_early or detect_facecam(src, info)
+            if not cam_early and (strict or force_censor):
+                raise UnsafeClip(f"nudité repérée, pas de facecam pour la version censurée ({(a or {}).get('raison', '')})")
     if a and strict:
         if not a["gameplay"]:
             raise UnsafeClip(f"pas du gameplay GTA ({a['raison']})")
-        if a["nudite"] and not nude:
-            cam_early = cam_early or detect_facecam(src, info)
-            if not cam_early:
-                raise UnsafeClip(f"nudité repérée par l'IA, pas de facecam ({a['raison']})")
-            nude = [(0.0, round(info["dur"], 2))]  # version censurée automatique : réaction du streamer tout du long
-        if not a["safe"] and not a["nudite"]:
+        if not a["safe"] and not a.get("nudite"):
             raise UnsafeClip(f"contenu à risque ({a['raison']})")
         if a["score"] < C.AUTO_MIN_SCORE:
             raise UnsafeClip(f"pas assez drôle/intéressant : {a['score']}/10 ({a['raison']})")

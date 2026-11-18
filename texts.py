@@ -148,7 +148,10 @@ def _claude(prompt: str, max_tokens: int = 700, images=None) -> str:
     import base64
     _count_call()
     content = []
-    for p in images or []:
+    for k, img in enumerate(images or [], 1):
+        p, t = img if isinstance(img, tuple) else (img, None)
+        if t is not None:
+            content.append({"type": "text", "text": f"Image {k} (à {t} s) :"})
         content.append({"type": "image", "source": {"type": "base64", "media_type": "image/jpeg",
                                                      "data": base64.b64encode(open(p, "rb").read()).decode()}})
     content.append({"type": "text", "text": prompt})
@@ -220,14 +223,17 @@ def _ai(clip, category, transcript, lang, frames=None):
         "- gameplay : true seulement si les images montrent bien le jeu GTA en train d'être joué. false si c'est "
         "surtout autre chose (vidéo YouTube regardée en réaction, film, IRL, écran d'attente, menu, discussion "
         "face caméra sans jeu).\n"
-        "- nudite : true si on voit de la nudité ou un contenu sexuel, même dans le jeu.\n"
+        "- nudite : true si on voit de la nudité ou un contenu sexuel, même dans le jeu ; "
+        "nudite_images : les numéros des images concernées (liste vide sinon).\n"
         "- safe : false si propos haineux, harcèlement, contenu sexuel explicite, infos personnelles, vraie mise en danger.\n"
         "- score : de 1 à 10, à quel point le clip est drôle OU intéressant pour quelqu'un qui scrolle. Sois exigeant : "
         "1-4 = banal, peu d'action, discussion ou menu, incompréhensible sans contexte ; 5-6 = correct ; "
         "7+ = il se passe vraiment quelque chose (réaction forte, chaos, exploit, absurde, découverte).\n"
         "- categorie : rage, fail, incroyable, decouverte, course ou drole.\n"
         f"2) TEXTES en {lang_name} :\n"
-        "- headline : titre en MAJUSCULES, 6 à 11 mots, façon titre de média accrocheur, qui DÉCRIT L'ACTION visible "
+        f"IMPORTANT : headline, ticker et title doivent être écrits en {lang_name}, la langue de la chaîne, même si "
+        "ces consignes sont en français et même si le streamer parle une autre langue.\n"
+        "- headline : titre en MAJUSCULES, 6 à 9 mots (55 caractères maximum), façon titre de média accrocheur, qui DÉCRIT L'ACTION visible "
         "(qui fait quoi, avec quoi, où, et ce qui tourne mal ou bien), pour qu'on comprenne le sujet sans le son. "
         "L'action passe avant le streamer : "
         + (f"tu peux citer {clip['streamer']} si ça aide, mais l'action doit être claire. " if known else
@@ -237,11 +243,12 @@ def _ai(clip, category, transcript, lang, frames=None):
         "- title : le titre réécrit normalement avec 1 emoji, pour la légende.\n"
         "Règles : jamais insultant ni humiliant ; jamais trompeur (n'invente ni fait, ni chiffre, ni citation absents "
         "du clip) ; pas de politique ; pas de vrai média cité. Si l'action est floue, reste général.\n"
-        "Réponds uniquement en JSON : {\"gameplay\": true, \"nudite\": false, \"safe\": true, \"score\": 7, "
+        "Réponds uniquement en JSON : {\"gameplay\": true, \"nudite\": false, \"nudite_images\": [], \"safe\": true, \"score\": 7, "
         "\"raison\": \"...\", \"categorie\": \"drole\", \"headline\": \"\", \"ticker\": [\"\", \"\"], \"title\": \"\"}"
     )
     d = _json(_claude(prompt, 700, images=frames))
     analysis = {"categorie": d.get("categorie") if d.get("categorie") in CATEGORIES else None,
+                "nudite_images": [int(i) for i in d.get("nudite_images", []) if str(i).isdigit()],
                 "gameplay": bool(d.get("gameplay", True)), "nudite": bool(d.get("nudite", False)),
                 "safe": bool(d.get("safe", True)), "score": int(d.get("score", 5)), "raison": d.get("raison", "")}
     return {"headline": d["headline"], "ticker": d["ticker"][:3], "title": d["title"],
