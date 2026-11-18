@@ -486,7 +486,7 @@ def encode(src: Path, out: Path, info, cam, peaks, ass_path, sfx: Path, sfx_at, 
 
 
 def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = None, out_lang=None,
-                 brief=None, strict=False) -> dict:
+                 brief=None, strict=False, force_censor=False) -> dict:
     """strict=True (montages automatiques, flashs, compils) : on écarte les clips hors jeu, douteux ou sans intérêt."""
     """Monte un clip. out_lang = langue de la chaîne cible (sous-titres traduits si elle diffère du clip)."""
     import texts
@@ -495,10 +495,18 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
     work.mkdir(parents=True, exist_ok=True)
     src = src or download(clip["url"], work / f"{clip['id']}_src.mp4")
     info = probe(src)
-    nude, nude_ratio = nsfw_timeline(src, work)
-    cam_early = detect_facecam(src, info) if nude else None
-    if nude and (nude_ratio > 0.5 or (not cam_early and nude_ratio > 0.35)):
-        raise UnsafeClip(f"nudité sur {int(nude_ratio * 100)} % du clip")
+    if force_censor:  # 🔞 : tu as signalé de la nudité → détection plus sensible, et jamais d'écart automatique
+        nude, nude_ratio = nsfw_timeline(src, work, threshold=0.25)
+        cam_early = detect_facecam(src, info)
+        if not nude:
+            if not cam_early:
+                raise UnsafeClip("🔞 demandé mais pas de facecam pour la version censurée")
+            nude = [(0.0, round(info["dur"], 2))]  # rien de repéré : on montre la réaction du streamer tout du long
+    else:
+        nude, nude_ratio = nsfw_timeline(src, work)
+        cam_early = detect_facecam(src, info) if nude else None
+        if nude and (nude_ratio > 0.5 or (not cam_early and nude_ratio > 0.35)):
+            raise UnsafeClip(f"nudité sur {int(nude_ratio * 100)} % du clip")
     tr = transcribe(src, lang) if info["audio"] else {"words": [], "segments": []}
     transcript = " ".join(w[2] for w in tr["words"])
     words = tr["words"]

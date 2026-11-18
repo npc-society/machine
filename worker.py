@@ -37,7 +37,7 @@ def other_langs(lang):
     return [l for l in C.LANGS if l != lang]
 
 
-def enqueue(queue, clip_id, lang, db=None, force=False, auto=False):
+def enqueue(queue, clip_id, lang, db=None, force=False, auto=False, censor=False):
     """Ajoute un montage à la file, sauf s'il est déjà prévu ou déjà fait (sauf 🔁 = force).
     auto=True : choisi par la machine (sera filtré par la note IA) ; un ✅ de ta part retire ce filtre."""
     clip = (db or {}).get(clip_id, {})
@@ -45,12 +45,16 @@ def enqueue(queue, clip_id, lang, db=None, force=False, auto=False):
         if q["clip"] == clip_id and q["lang"] == lang:
             if not auto:
                 q.pop("auto", None)
+            if censor:
+                q["censor"] = True
             return False
     if not force and lang in clip.get("rendered", []):
         return False
     item = {"clip": clip_id, "lang": lang}
     if auto:
         item["auto"] = True
+    if censor:
+        item["censor"] = True
     queue.append(item)
     return True
 
@@ -74,12 +78,15 @@ def check():
                     clip["status"] = "jete"
                 elif picks:
                     clip["status"] = "traite"
-                    if "garder" in picks:
-                        enqueue(queue, clip["id"], clip["lang"], db)
+                    censor = "censure" in picks
+                    if censor:
+                        clip["censure"] = True
+                    if "garder" in picks or censor:
+                        enqueue(queue, clip["id"], clip["lang"], db, censor=censor)
                     if "croise" in picks:
                         clip["cross"] = True
                         for l in other_langs(clip["lang"]):
-                            enqueue(queue, clip["id"], l, db)
+                            enqueue(queue, clip["id"], l, db, censor=censor)
                     if "compil" in picks:
                         clip["compil"] = True
             m = by_mont.get(msg["id"])
@@ -94,7 +101,7 @@ def check():
                     c = db.get(m["clip_id"])
                     if c:
                         c["reroll"] = c.get("reroll", 0) + 1
-                        enqueue(queue, m["clip_id"], m["lang"], db, force=True)
+                        enqueue(queue, m["clip_id"], m["lang"], db, force=True, censor=bool(c.get("censure")))
 
     C.save_json(DB_FILE, db)
     C.save_json(QUEUE_FILE, queue)
@@ -119,7 +126,7 @@ def render():
         work = C.OUT / f"{clip['id']}_{out_lang}"
         try:
             r = montage.render_short(clip, work, target_mb=C.DISCORD_MAX_MB, out_lang=out_lang,
-                                     strict=bool(item.get("auto")))
+                                     strict=bool(item.get("auto")), force_censor=bool(item.get("censor")))
             txt = r["texts"]
             a = r.get("analysis") or {}
             warn = ""

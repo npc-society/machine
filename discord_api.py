@@ -9,7 +9,7 @@ import requests
 from config import DISCORD_TOKEN
 
 API = "https://discord.com/api/v10"
-CHOICES = {"✅": "garder", "🌍": "croise", "⭐": "compil", "❌": "jeter"}
+CHOICES = {"✅": "garder", "🔞": "censure", "🌍": "croise", "⭐": "compil", "❌": "jeter"}
 VALIDATE = {"✅": "valide", "🔁": "refaire", "❌": "jeter"}
 
 
