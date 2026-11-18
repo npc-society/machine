@@ -152,7 +152,7 @@ def clip_embed(c, now, rank_label=""):
     }
 
 
-def propose(c, lang, now, db, auto=False):
+def propose(c, lang, now, db, auto=False, short=False):
     ch = C.channel("CLIPS", lang)
     if not ch or not C.DISCORD_TOKEN:
         print(f"[{lang}] salon Discord non configuré, clip archivé seulement : {c['title']}")
@@ -161,6 +161,9 @@ def propose(c, lang, now, db, auto=False):
         emb = clip_embed(c, now)
         if auto:
             emb["footer"]["text"] = "🤖 Montage automatique lancé · " + emb["footer"]["text"]
+        if short:
+            emb["footer"]["text"] = ("⚡ Clip court à fort buzz : réservé aux compils et flashs "
+                                     "(✅ = short quand même · ❌ = exclure)")
         msg = D.send(ch, embeds=[emb])
         D.add_buttons(ch, msg["id"])
     db[c["id"]] = {
@@ -171,6 +174,8 @@ def propose(c, lang, now, db, auto=False):
         "status": "propose", "channel": ch, "message_id": msg["id"] if msg else None,
         "proposed_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
+    if short:
+        db[c["id"]]["compil"] = True
 
 
 # --- Main -------------------------------------------------------------------
@@ -200,7 +205,7 @@ def run(mode="hunt"):
     for lang in C.LANGS:
         pool = []
         for c in clips:
-            if c.get("language") != lang or not (C.MIN_CLIP_SECONDS <= c["duration"] <= C.MAX_CLIP_SECONDS):
+            if c.get("language") != lang or c["duration"] > C.MAX_CLIP_SECONDS:
                 continue
             s = streamers.get(c["broadcaster_id"])
             c["_viewers"] = s["max_viewers"] if s else None
@@ -210,6 +215,10 @@ def run(mode="hunt"):
                 c["_tier"] = tier(c["_viewers"])
             c["_cat"] = categorize(c["title"])
             pool.append(c)
+        # Clips trop courts pour un short : gardés seulement s'ils font un gros buzz, pour les compils et flashs
+        shorts = [c for c in pool if c["duration"] < C.MIN_CLIP_SECONDS and (
+            c["view_count"] >= C.MIN_VIEWS_BIG * C.SHORT_BUZZ_FACTOR or buzz_ratio(c) >= C.SHORT_BUZZ_RATIO)]
+        pool = [c for c in pool if c["duration"] >= C.MIN_CLIP_SECONDS]
         big = [c for c in pool if c["_tier"] != "petit" and c["view_count"] >= C.MIN_VIEWS_BIG]
         small = [c for c in pool if c["_tier"] == "petit" and c["view_count"] >= C.MIN_VIEWS_SMALL]
 
@@ -227,7 +236,11 @@ def run(mode="hunt"):
                     W.enqueue(queue, c["id"], lang, db, auto=True)
                 if c["broadcaster_id"] in streamers:
                     streamers[c["broadcaster_id"]]["clips_retenus"] += 1
-            print(f"[{lang}] {len(big)} gros + {len(small)} pépites proposés")
+            shorts = sorted((c for c in shorts if c["id"] not in db), key=lambda c: velocity(c, now),
+                            reverse=True)[:C.SHORT_BUZZ_PER_RUN]
+            for c in shorts:
+                propose(c, lang, now, db, short=True)
+            print(f"[{lang}] {len(big)} gros + {len(small)} pépites + {len(shorts)} courts à fort buzz proposés")
         else:  # récap du jour
             ch = C.channel("CLIPS", lang)
             top = sorted(big, key=lambda c: c["view_count"], reverse=True)[:C.DAILY_BIG]

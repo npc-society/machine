@@ -31,7 +31,8 @@ Repérage, tri depuis Discord, montage automatique et compilations. Elle tourne 
 
 ## Tri automatique
 - **Clips trop courts ignorés** : moins de 15 s (variable `MIN_CLIP_SECONDS`).
-- **Nudité** : chaque clip est analysé image par image (NudeNet). En cas de nudité, il est écarté et rien n'est monté.
+- **Nudité** : chaque clip est analysé image par image (NudeNet, 2 images par seconde). Sur les passages concernés, le jeu est fortement flouté et, s'il y a une facecam, remplacé par un gros plan sur la réaction du streamer, avec l'étiquette « CENSURÉ PAR LES PNJ ». Si la nudité couvre plus de la moitié du clip (plus d'un tiers sans facecam), le clip est écarté.
+- **Clips courts à fort buzz** : un clip de moins de 15 s n'est pas monté en short, mais s'il fait un gros buzz (vues ≥ 4 × `MIN_VIEWS`, ou 4 fois l'audience d'une pépite), il est proposé avec ⚡ et gardé pour les compils et les flashs.
 - **Montages automatiques notés par l'IA** (avec `ANTHROPIC_API_KEY`) : seuls les clips jugés drôles ou intéressants (note ≥ `AUTO_MIN_SCORE`, 6/10 par défaut) et publiables sont envoyés. Tes ✅ manuels passent toujours.
 
 ## Formats automatiques

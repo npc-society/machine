@@ -8,6 +8,7 @@ import json
 import math
 import random
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -159,6 +160,38 @@ def nsfw_check(src: Path, work: Path, frames: int = 10, threshold: float = 0.45)
     return (len(hits) < 2), ", ".join(sorted(set(hits)))  # 2 détections minimum pour éviter les faux positifs
 
 
+def nsfw_timeline(src: Path, work: Path, fps: float = 2.0, threshold: float = 0.45):
+    """Moments de nudité dans le clip : liste d'intervalles (début, fin) et part du clip concernée."""
+    try:
+        from nudenet import NudeDetector
+    except ImportError:
+        print("⚠️ NudeNet absent : contrôle de nudité désactivé")
+        return [], 0.0
+    info = probe(src)
+    fdir = work / "frames"
+    shutil.rmtree(fdir, ignore_errors=True)
+    fdir.mkdir(parents=True, exist_ok=True)
+    run(["ffmpeg", "-y", "-v", "error", "-i", str(src), "-vf", f"fps={fps},scale=960:-2", str(fdir / "f%04d.jpg")])
+    det = NudeDetector()
+    flagged = []
+    for k, f in enumerate(sorted(fdir.glob("*.jpg"))):
+        if any(d.get("class") in NSFW_CLASSES and d.get("score", 0) >= threshold for d in det.detect(str(f))):
+            flagged.append(k / fps)
+    intervals = []
+    for t in flagged:  # on regroupe et on ajoute une marge de sécurité
+        a, b = max(t - 0.75, 0), min(t + 1 / fps + 0.75, info["dur"])
+        if intervals and a <= intervals[-1][1]:
+            intervals[-1] = (intervals[-1][0], b)
+        else:
+            intervals.append((a, b))
+    covered = sum(b - a for a, b in intervals) / max(info["dur"], 1)
+    return [(round(a, 2), round(b, 2)) for a, b in intervals], covered
+
+
+def _enable(intervals) -> str:
+    return "+".join(f"between(t,{a},{b})" for a, b in intervals)
+
+
 def detect_facecam(path: Path, info: dict):
     """Cherche une facecam stable dans un coin. Renvoie (x, y, w, h) en pixels, ou None."""
     try:
@@ -246,7 +279,8 @@ def game_y(layout: str) -> int:
     return CAM_Y + CAM_H + 20 if layout == "facecam" else 620
 
 
-def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, layout, rank=None, brief=None):
+def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, layout, rank=None, brief=None,
+              censored=None):
     b = C.BRAND
     end = ts(dur)
     ev = []
@@ -305,6 +339,10 @@ def build_ass(path: Path, words, dur, txt, stamp, peak, streamer, lang, seed, la
         anim = (f"{{\\an9\\pos({W - 28},{gy + 22})\\frz-4\\fscx180\\fscy180\\alpha&HFF&"
                 f"\\t(0,140,\\fscx100\\fscy100\\alpha&H00&)}}")
         ev.append(f"Dialogue: 7,{ts(peak)},{ts(min(peak + 2.2, dur))},Stamp,,0,0,0,,{anim}{ass_text(stamp)}")
+    # Passages masqués (nudité) : petite étiquette satirique sur le jeu
+    word = {"fr": "CENSURÉ PAR LES PNJ", "es": "CENSURADO POR LOS NPC"}.get(lang, "CENSORED BY THE NPCS")
+    for a, b in censored or []:
+        ev.append(f"Dialogue: 7,{ts(a)},{ts(b)},Kicker,,0,0,0,,{{\\an7\\pos(24,{gy + 20})}}{word}")
     path.write_text(ass_header() + "\n".join(ev) + "\n", encoding="utf-8")
 
 
@@ -324,12 +362,13 @@ def _esc(p: Path) -> str:
     return str(p).replace("\\", "/").replace(":", "\\:")
 
 
-def encode(src: Path, out: Path, info, cam, peaks, ass_path, sfx: Path, sfx_at, target_mb, reaction=None):
+def encode(src: Path, out: Path, info, cam, peaks, ass_path, sfx: Path, sfx_at, target_mb, reaction=None,
+           censor=None):
     dur = info["dur"]
     layout = "facecam" if cam else "flou"
     gy = game_y(layout)
     inputs = [["-i", str(src)]]
-    fg = [f"[0:v]split=3[a][b][c]",
+    fg = [f"[0:v]split=4[a][b][c][d]",
           f"[a]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},boxblur=26:2,"
           f"eq=brightness=-0.18:saturation=0.75[bg]"]
     # Le jeu, zoomé aux moments forts (seulement le jeu, pas l'habillage)
@@ -338,9 +377,21 @@ def encode(src: Path, out: Path, info, cam, peaks, ass_path, sfx: Path, sfx_at, 
         bumps = "+".join(f"max(0,1-abs(it-{p})/0.45)" for p in peaks)
         game += (f",zoompan=z='1+0.13*min(1,{bumps})':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
                  f":s={W}x{GAME_H}:fps={FPS}")
+    if censor:  # nudité : jeu fortement flouté sur ces passages
+        game += f",boxblur=60:6:enable='{_enable(censor)}'"
     fg.append(game + "[game]")
     fg.append(f"[bg][game]overlay=0:{gy}[s1]")
     last = "s1"
+    if censor and cam:  # … et on montre la réaction du streamer en grand à la place
+        x, y, cw, ch = cam
+        zw = min(int(ch * W / GAME_H) // 2 * 2, info["w"])
+        zx = min(max(x + cw // 2 - zw // 2, 0), info["w"] - zw)
+        fg.append(f"[d]crop={zw}:{ch}:{zx}:{y},scale={W}:{GAME_H}:force_original_aspect_ratio=increase,"
+                  f"crop={W}:{GAME_H},setsar=1[face]")
+        fg.append(f"[{last}][face]overlay=0:{gy}:enable='{_enable(censor)}'[s1b]")
+        last = "s1b"
+    else:
+        fg.append("[d]nullsink")
     if cam:
         x, y, cw, ch = cam
         camf = (f"[c]crop={cw}:{ch}:{x}:{y},scale={W}:{CAM_H}:force_original_aspect_ratio=increase,"
@@ -424,9 +475,10 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
     work.mkdir(parents=True, exist_ok=True)
     src = src or download(clip["url"], work / f"{clip['id']}_src.mp4")
     info = probe(src)
-    ok, why = nsfw_check(src, work)
-    if not ok:
-        raise UnsafeClip(f"nudité détectée ({why})")
+    nude, nude_ratio = nsfw_timeline(src, work)
+    cam_early = detect_facecam(src, info) if nude else None
+    if nude and (nude_ratio > 0.5 or (not cam_early and nude_ratio > 0.35)):
+        raise UnsafeClip(f"nudité sur {int(nude_ratio * 100)} % du clip")
     tr = transcribe(src, lang) if info["audio"] else {"words": [], "segments": []}
     transcript = " ".join(w[2] for w in tr["words"])
     words = tr["words"]
@@ -444,13 +496,13 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
     seed = clip["id"] + out_lang + str(clip.get("reroll", 0))
     txt = texts.describe(clip, category, transcript, seed=seed, lang=out_lang)
     peaks = audio_peaks(src, info["dur"]) if info["audio"] else []
-    cam = detect_facecam(src, info)
+    cam = cam_early if nude else detect_facecam(src, info)
     layout = "facecam" if cam else "flou"
     meme = pick_meme(out_lang, category, seed)
     peak = peaks[0] if peaks else (info["dur"] * 0.6 if info["dur"] > 4 else None)
     ass_path = work / f"{clip['id']}_{out_lang}.ass"
     build_ass(ass_path, words, info["dur"], txt, meme["stamp"] if C.STAMPS else None, peak, clip["streamer"], out_lang, seed,
-              layout, rank=rank, brief=brief)
+              layout, rank=rank, brief=brief, censored=nude)
     sfx = None
     if meme["sfx"]:
         for ext in (".wav", ".mp3"):
@@ -459,10 +511,10 @@ def render_short(clip: dict, work: Path, target_mb=None, rank=None, src: Path = 
                 sfx = p
                 break
     out = work / f"{clip['id']}_{out_lang}{'_r' + str(rank) if rank else ''}.mp4"
-    encode(src, out, info, cam, peaks, ass_path, sfx, peak, target_mb, meme["reaction"])
+    encode(src, out, info, cam, peaks, ass_path, sfx, peak, target_mb, meme["reaction"], censor=nude)
     return {"path": out, "category": category, "transcript": transcript, "meme": meme, "texts": txt,
             "layout": layout, "duration": info["dur"], "source": src, "lang": out_lang,
-            "translated": translated}
+            "translated": translated, "censored": nude}
 
 
 def render_intro(title: str, lang: str, work: Path, seconds: float = 2.4) -> Path:
