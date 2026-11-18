@@ -60,8 +60,9 @@ def headline_from_title(clip):
         return None
     text = " ".join(words).strip(" -:.,!").upper()
     s = clip["streamer"].upper()
-    if not is_known(clip):  # petit streamer : son nom n'accroche personne, on garde l'action seule
-        text = text.replace(s, "").strip(" -:.,!")
+    if not is_known(clip):  # petit streamer : son nom n'accroche personne, on mise sur l'action
+        anon = ANON.get(clip.get("lang"), "THIS PLAYER")
+        text = text.replace(s, anon).strip(" -:.,!") if s in text else text
         return text if len(text.split()) >= 3 else None
     return text if s in text else f"{s} : {text}"
 
