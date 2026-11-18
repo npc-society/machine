@@ -39,6 +39,14 @@ HEADLINES = {
     },
 }
 
+ANON = {"fr": "UN JOUEUR", "en": "THIS PLAYER", "es": "UN JUGADOR"}
+
+
+def is_known(clip):
+    """Streamer connu du grand public (gros ou moyen) : on peut miser sur son nom. Sinon, on mise sur l'action."""
+    return clip.get("tier") in ("gros", "moyen") or (clip.get("views") or 0) >= 1500
+
+
 FILLER = {"mdr", "ptdr", "lol", "lmao", "kekw", "omegalul", "xd", "jaja", "jajaja", "wtf", "clip", "gta", "gta6",
           "gtavi", "6", "vi", "lul", "pog", "poggers", "jpp"}
 
@@ -52,6 +60,9 @@ def headline_from_title(clip):
         return None
     text = " ".join(words).strip(" -:.,!").upper()
     s = clip["streamer"].upper()
+    if not is_known(clip):  # petit streamer : son nom n'accroche personne, on garde l'action seule
+        text = text.replace(s, "").strip(" -:.,!")
+        return text if len(text.split()) >= 3 else None
     return text if s in text else f"{s} : {text}"
 
 
@@ -143,7 +154,7 @@ def _caption(clip, lang, title, category):
 
 def _template(clip, category, seed, lang):
     lang = lang if lang in HEADLINES else "en"
-    s = clip["streamer"].upper()
+    s = clip["streamer"].upper() if is_known(clip) else ANON.get(lang, "THIS PLAYER")
     rnd = random.Random(seed)
     headline = (headline_from_title(clip) if lang == clip.get("lang") else None) \
         or rnd.choice(HEADLINES[lang][category]).format(s=s)
@@ -163,6 +174,9 @@ def _ai(clip, category, transcript, lang):
         "Donne :\n"
         "- headline : titre en MAJUSCULES, 5 à 10 mots, qui dit clairement CE QUI SE PASSE dans le clip (on doit "
         "comprendre le sujet sans le son) et donne envie de regarder jusqu'au bout. Ton taquin, un peu moqueur ;\n"
+        + ("  Le streamer est connu : tu peux citer son nom.\n" if is_known(clip) else
+           "  Le streamer est peu connu : ne mets PAS son nom dans le titre ; décris l'action de façon accrocheuse, "
+           "comme un titre de média (« UN JOUEUR VOLE UN AVION ET FINIT DANS L'OCÉAN »).\n") +
         "- ticker : 2 courts commentaires ironiques en MAJUSCULES (6 à 10 mots) sur l'action précise du clip ;\n"
         "- title : le titre réécrit normalement avec 1 emoji, pour la légende.\n"
         "Règles strictes : jamais insultant ni humiliant pour le streamer ; jamais trompeur (n'invente pas de fait, "
