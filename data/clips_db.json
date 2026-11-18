@@ -644,7 +644,7 @@
   "thumbnail": "",
   "game": "Grand Theft Auto VI",
   "category": "drole",
-  "status": "propose",
+  "status": "jete",
   "channel": "1572689952393666580",
   "message_id": "1572716301896515605",
   "proposed_at": "2026-11-18T20:52:56Z",
@@ -776,7 +776,7 @@
   "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/5f1a0124-a21a-45e6-acd9-3a793a06ed43/landscape/thumb/thumb-0000000000-480x272.jpg",
   "game": "Grand Theft Auto VI",
   "category": "drole",
-  "status": "propose",
+  "status": "jete",
   "channel": "1572689984186753136",
   "message_id": "1572716357299077314",
   "proposed_at": "2026-11-18T20:52:56Z"
@@ -796,7 +796,7 @@
   "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/beed2da6-6439-4c5c-8a44-8a1615bfbd94/landscape/thumb/thumb-0000000000-480x272.jpg",
   "game": "Grand Theft Auto VI",
   "category": "drole",
-  "status": "propose",
+  "status": "jete",
   "channel": "1572689984186753136",
   "message_id": "1572716367281655971",
   "proposed_at": "2026-11-18T20:52:56Z",
@@ -965,7 +965,7 @@
   "thumbnail": "",
   "game": "Grand Theft Auto VI",
   "category": "drole",
-  "status": "propose",
+  "status": "jete",
   "channel": "1572689952393666580",
   "message_id": "1572726836746780903",
   "proposed_at": "2026-11-18T21:34:51Z",
@@ -988,7 +988,7 @@
   "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/b8bab055-24f6-4725-9e2b-5b030bf49734/landscape/thumb/thumb-0000000000-480x272.jpg",
   "game": "Grand Theft Auto VI",
   "category": "drole",
-  "status": "propose",
+  "status": "jete",
   "channel": "1572689952393666580",
   "message_id": "1572726853062500535",
   "proposed_at": "2026-11-18T21:34:51Z",
@@ -1034,10 +1034,14 @@
   "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/857da437-eaeb-4b74-902a-ea7ac1912745/landscape/thumb/thumb-0000000000-480x272.jpg",
   "game": "Grand Theft Auto VI",
   "category": "drole",
-  "status": "propose",
+  "status": "traite",
   "channel": "1572689984186753136",
   "message_id": "1572726886579314800",
-  "proposed_at": "2026-11-18T21:34:51Z"
+  "proposed_at": "2026-11-18T21:34:51Z",
+  "censure": true,
+  "rendered": [
+   "en"
+  ]
  },
  "ModernBigWolfResidentSleeper-zUnNje_xisYIyfTG": {
   "id": "ModernBigWolfResidentSleeper-zUnNje_xisYIyfTG",
@@ -1054,10 +1058,11 @@
   "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/d4fbdddf-cde9-4da5-b789-fca81b24b326/landscape/thumb/thumb-0000000000-480x272.jpg",
   "game": "Grand Theft Auto VI",
   "category": "drole",
-  "status": "propose",
+  "status": "traite",
   "channel": "1572689984186753136",
   "message_id": "1572726902966194349",
-  "proposed_at": "2026-11-18T21:34:51Z"
+  "proposed_at": "2026-11-18T21:34:51Z",
+  "compil": true
  },
  "IgnorantAlertWeaselCmonBruh-25JH2deNGiQMf6Ew": {
   "id": "IgnorantAlertWeaselCmonBruh-25JH2deNGiQMf6Ew",
@@ -1265,7 +1270,7 @@
   "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/503d872c-a218-415d-8a45-732f51c5dda6/landscape/thumb/thumb-0000000000-480x272.jpg",
   "game": "Grand Theft Auto VI",
   "category": "decouverte",
-  "status": "propose",
+  "status": "jete",
   "channel": "1572689952393666580",
   "message_id": "1572734570367811745",
   "proposed_at": "2026-11-18T22:05:32Z",
@@ -1286,7 +1291,7 @@
   "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/243bfe4a-23fd-4677-b363-f562a242a173/landscape/thumb/thumb-0000000000-480x272.jpg",
   "game": "Grand Theft Auto VI",
   "category": "decouverte",
-  "status": "propose",
+  "status": "jete",
   "channel": "1572689952393666580",
   "message_id": "1572734586524532838",
   "proposed_at": "2026-11-18T22:05:32Z",
@@ -1328,7 +1333,7 @@
   "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/b9025566-b78e-4ff9-8f4b-549293cdab42/landscape/thumb/thumb-0000000000-480x272.jpg",
   "game": "Grand Theft Auto VI",
   "category": "drole",
-  "status": "propose",
+  "status": "jete",
   "channel": "1572689984186753136",
   "message_id": "1572734618883465258",
   "proposed_at": "2026-11-18T22:05:32Z"
@@ -1368,7 +1373,7 @@
   "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/76e714f6-c5cd-4416-b3b6-bebc68f80a5c/landscape/thumb/thumb-0000000000-480x272.jpg",
   "game": "Grand Theft Auto VI",
   "category": "drole",
-  "status": "propose",
+  "status": "jete",
   "channel": "1572689984186753136",
   "message_id": "1572734649254412543",
   "proposed_at": "2026-11-18T22:05:32Z",
@@ -1430,10 +1435,14 @@
   "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/1eb97dbf-7cb9-4c95-aab5-0817090d90fd/landscape/thumb/thumb-0000000000-480x272.jpg",
   "game": "Grand Theft Auto VI",
   "category": "drole",
-  "status": "propose",
+  "status": "traite",
   "channel": "1572694526538022942",
   "message_id": "1572734695341293619",
-  "proposed_at": "2026-11-18T22:05:32Z"
+  "proposed_at": "2026-11-18T22:05:32Z",
+  "censure": true,
+  "rendered": [
+   "es"
+  ]
  },
  "HungryResoluteGazelleRlyTho-jECTTPaujGbB3Xyf": {
   "id": "HungryResoluteGazelleRlyTho-jECTTPaujGbB3Xyf",
@@ -1491,7 +1500,7 @@
   "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/855bd74d-1d82-4e8b-9f96-d4383e6c9cbb/landscape/thumb/thumb-0000000000-480x272.jpg",
   "game": "Grand Theft Auto VI",
   "category": "drole",
-  "status": "propose",
+  "status": "jete",
   "channel": "1572694526538022942",
   "message_id": "1572734747581481162",
   "proposed_at": "2026-11-18T22:05:32Z"
