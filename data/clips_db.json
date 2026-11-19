@@ -59,7 +59,8 @@
   "status": "propose",
   "channel": "1572689952393666580",
   "message_id": "1572696047107571743",
-  "proposed_at": "2026-11-18T19:32:26Z"
+  "proposed_at": "2026-11-18T19:32:26Z",
+  "flash_fait_fr": true
  },
  "PeppyCarelessTomatoSeemsGood-uyD1xffvD3iyALiu": {
   "id": "PeppyCarelessTomatoSeemsGood-uyD1xffvD3iyALiu",
@@ -160,7 +161,8 @@
   "status": "propose",
   "channel": "1572689984186753136",
   "message_id": "1572696106372956291",
-  "proposed_at": "2026-11-18T19:32:26Z"
+  "proposed_at": "2026-11-18T19:32:26Z",
+  "flash_fait_en": true
  },
  "AmusedFancyShieldAMPEnergy-XOFv5AE7x6kpFJX3": {
   "id": "AmusedFancyShieldAMPEnergy-XOFv5AE7x6kpFJX3",
@@ -244,7 +246,8 @@
   "status": "propose",
   "channel": "1572689952393666580",
   "message_id": "1572699589155356847",
-  "proposed_at": "2026-11-18T19:46:31Z"
+  "proposed_at": "2026-11-18T19:46:31Z",
+  "flash_fait_fr": true
  },
  "BrainyPlayfulSpindleEleGiggle-KbjsWVZ1rsFiwc99": {
   "id": "BrainyPlayfulSpindleEleGiggle-KbjsWVZ1rsFiwc99",
@@ -264,7 +267,8 @@
   "status": "propose",
   "channel": "1572689952393666580",
   "message_id": "1572699599024693401",
-  "proposed_at": "2026-11-18T19:46:31Z"
+  "proposed_at": "2026-11-18T19:46:31Z",
+  "flash_fait_fr": true
  },
  "EphemeralSwissBillBigBrother-tceU4oP5P7z_fYqI": {
   "id": "EphemeralSwissBillBigBrother-tceU4oP5P7z_fYqI",
@@ -890,7 +894,8 @@
   "status": "propose",
   "channel": "1572694526538022942",
   "message_id": "1572716414815576126",
-  "proposed_at": "2026-11-18T20:52:56Z"
+  "proposed_at": "2026-11-18T20:52:56Z",
+  "flash_fait_es": true
  },
  "PoisedDaintyPassionfruitSquadGoals-DU-nu1uUzk4f2tG0": {
   "id": "PoisedDaintyPassionfruitSquadGoals-DU-nu1uUzk4f2tG0",
@@ -954,7 +959,8 @@
   "channel": "1572694526538022942",
   "message_id": "1572716443324256438",
   "proposed_at": "2026-11-18T20:52:56Z",
-  "compil": true
+  "compil": true,
+  "flash_fait_es": true
  },
  "PunchyInexpensiveTildeMau5-7StLAtUvj20MEXyC": {
   "id": "PunchyInexpensiveTildeMau5-7StLAtUvj20MEXyC",
@@ -1323,7 +1329,8 @@
   "channel": "1572689984186753136",
   "message_id": "1572734603830235299",
   "proposed_at": "2026-11-18T22:05:32Z",
-  "auto_ecarte": "pas du gameplay GTA (Les images montrent surtout un écran de menu/sauvegarde de GTA VI (« AUTOSAVE PROLOGUE ») et le streamer face caméra en réaction, sans action de jeu visible. Le clip repose sur des réactions et un chat animé, mais le contexte n'est pas compréhensible sans le son, qui est absent du texte fourni.)"
+  "auto_ecarte": "pas du gameplay GTA (Les images montrent surtout un écran de menu/sauvegarde de GTA VI (« AUTOSAVE PROLOGUE ») et le streamer face caméra en réaction, sans action de jeu visible. Le clip repose sur des réactions et un chat animé, mais le contexte n'est pas compréhensible sans le son, qui est absent du texte fourni.)",
+  "flash_fait_en": true
  },
  "ModernClumsyBobaFloof-6H36OkNrTo9oo_Er": {
   "id": "ModernClumsyBobaFloof-6H36OkNrTo9oo_Er",
@@ -1983,7 +1990,8 @@
   "status": "propose",
   "channel": "1572694526538022942",
   "message_id": "1572763872396447818",
-  "proposed_at": "2026-11-19T00:01:22Z"
+  "proposed_at": "2026-11-19T00:01:22Z",
+  "flash_fait_es": true
  },
  "ShyPeppyWombatBCWarrior-cWqBmTNNbCScdlUV": {
   "id": "ShyPeppyWombatBCWarrior-cWqBmTNNbCScdlUV",
@@ -2438,7 +2446,8 @@
   "channel": "1572689984186753136",
   "message_id": "1572793934948859965",
   "proposed_at": "2026-11-19T02:01:11Z",
-  "auto_ecarte": "pas assez drôle/intéressant : 5/10 (Gameplay GTA visible, mais les images 2 et 3 montrent un contenu sexuel explicite dans le jeu (scène de club avec nudité), ce qui rend le clip non safe pour la publication.)"
+  "auto_ecarte": "pas assez drôle/intéressant : 5/10 (Gameplay GTA visible, mais les images 2 et 3 montrent un contenu sexuel explicite dans le jeu (scène de club avec nudité), ce qui rend le clip non safe pour la publication.)",
+  "flash_fait_en": true
  },
  "TubularBashfulHeronShadyLulu-XAm39nSjTyF0Gwcp": {
   "id": "TubularBashfulHeronShadyLulu-XAm39nSjTyF0Gwcp",
