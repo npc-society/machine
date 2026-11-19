@@ -17,7 +17,8 @@
   "status": "propose",
   "channel": "1572689952393666580",
   "message_id": "1572696024793874433",
-  "proposed_at": "2026-11-18T19:32:26Z"
+  "proposed_at": "2026-11-18T19:32:26Z",
+  "flash_fait_fr": true
  },
  "CourageousAlertFalconOpieOP-Inh8e8xSBAV-Bx6m": {
   "id": "CourageousAlertFalconOpieOP-Inh8e8xSBAV-Bx6m",
@@ -37,7 +38,8 @@
   "status": "propose",
   "channel": "1572689952393666580",
   "message_id": "1572696035367592008",
-  "proposed_at": "2026-11-18T19:32:26Z"
+  "proposed_at": "2026-11-18T19:32:26Z",
+  "flash_fait_fr": true
  },
  "EncouragingSeductiveVelociraptorEagleEye-yO3GI5ZqvV2lzPRo": {
   "id": "EncouragingSeductiveVelociraptorEagleEye-yO3GI5ZqvV2lzPRo",
@@ -117,7 +119,8 @@
   "status": "propose",
   "channel": "1572689984186753136",
   "message_id": "1572696083895947265",
-  "proposed_at": "2026-11-18T19:32:26Z"
+  "proposed_at": "2026-11-18T19:32:26Z",
+  "flash_fait_en": true
  },
  "BlueIcySnoodSaltBae-qKp3QE1R_FoncNN1": {
   "id": "BlueIcySnoodSaltBae-qKp3QE1R_FoncNN1",
@@ -220,7 +223,8 @@
   "proposed_at": "2026-11-18T19:46:31Z",
   "rendered": [
    "fr"
-  ]
+  ],
+  "flash_fait_fr": true
  },
  "ComfortableEnticingAppleRuleFive-NvsuUlEFrEQSDBf0": {
   "id": "ComfortableEnticingAppleRuleFive-NvsuUlEFrEQSDBf0",
@@ -696,7 +700,8 @@
   "proposed_at": "2026-11-18T20:52:56Z",
   "rendered": [
    "en"
-  ]
+  ],
+  "flash_fait_en": true
  },
  "SplendidFurryCobraLitty-aRzKqT4E06s7soNa": {
   "id": "SplendidFurryCobraLitty-aRzKqT4E06s7soNa",
@@ -844,7 +849,8 @@
   "proposed_at": "2026-11-18T20:52:56Z",
   "rendered": [
    "es"
-  ]
+  ],
+  "flash_fait_es": true
  },
  "SlickHedonisticZebraFUNgineer-mE6bCuuNZnmobaIT": {
   "id": "SlickHedonisticZebraFUNgineer-mE6bCuuNZnmobaIT",
@@ -1062,7 +1068,8 @@
   "channel": "1572689984186753136",
   "message_id": "1572726902966194349",
   "proposed_at": "2026-11-18T21:34:51Z",
-  "compil": true
+  "compil": true,
+  "flash_fait_en": true
  },
  "IgnorantAlertWeaselCmonBruh-25JH2deNGiQMf6Ew": {
   "id": "IgnorantAlertWeaselCmonBruh-25JH2deNGiQMf6Ew",
@@ -1955,7 +1962,8 @@
   "channel": "1572694526538022942",
   "message_id": "1572763856554692630",
   "proposed_at": "2026-11-19T00:01:22Z",
-  "auto_ecarte": "pas du gameplay GTA (Les images montrent un streamer face caméra, puis le menu de la PS5 avec l'option « Eliminar » du jeu GTA (suppression, chargement), puis l'accueil de la console. Pas d'action de jeu visible, aucun propos clair : clip banal et difficile à comprendre sans contexte.)"
+  "auto_ecarte": "pas du gameplay GTA (Les images montrent un streamer face caméra, puis le menu de la PS5 avec l'option « Eliminar » du jeu GTA (suppression, chargement), puis l'accueil de la console. Pas d'action de jeu visible, aucun propos clair : clip banal et difficile à comprendre sans contexte.)",
+  "flash_fait_es": true
  },
  "DiligentBumblingBaconKlappa-whzsnIIWPJDxTdud": {
   "id": "DiligentBumblingBaconKlappa-whzsnIIWPJDxTdud",
@@ -1995,7 +2003,8 @@
   "status": "propose",
   "channel": "1572694526538022942",
   "message_id": "1572763888229941260",
-  "proposed_at": "2026-11-19T00:01:22Z"
+  "proposed_at": "2026-11-19T00:01:22Z",
+  "flash_fait_es": true
  },
  "OnerousCrunchyAsparagusSMOrc-cJ0xox6OygWc6b7r": {
   "id": "OnerousCrunchyAsparagusSMOrc-cJ0xox6OygWc6b7r",
