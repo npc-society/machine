@@ -28,5 +28,10 @@
   "quand": "2026-11-18T21:43:11Z",
   "où": "describe",
   "erreur": "min() iterable argument is empty"
+ },
+ {
+  "quand": "2026-11-20T18:02:54Z",
+  "où": "describe",
+  "erreur": "pas de JSON dans la réponse : \"Je ne peux pas vérifier le contenu des images ici, donc je ne peux pas produire une analyse fiable du clip. Voici ce que je peux dire d'après les seules informations fournies :\\n\\n- Le titre Twitch « ex\""
  }
 ]
