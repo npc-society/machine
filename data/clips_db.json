@@ -141,7 +141,8 @@
   "status": "propose",
   "channel": "1572689984186753136",
   "message_id": "1572696095140749399",
-  "proposed_at": "2026-11-18T19:32:26Z"
+  "proposed_at": "2026-11-18T19:32:26Z",
+  "flash_fait_en": true
  },
  "WiseBusyStapleNononoCat--XYNEyYmRlr4KoEY": {
   "id": "WiseBusyStapleNononoCat--XYNEyYmRlr4KoEY",
@@ -874,7 +875,8 @@
   "status": "propose",
   "channel": "1572694526538022942",
   "message_id": "1572716405374058498",
-  "proposed_at": "2026-11-18T20:52:56Z"
+  "proposed_at": "2026-11-18T20:52:56Z",
+  "flash_fait_es": true
  },
  "DiligentSleepyApePJSalt-36726ZfcpgTYlOQu": {
   "id": "DiligentSleepyApePJSalt-36726ZfcpgTYlOQu",
@@ -2074,7 +2076,8 @@
   "channel": "1572694526538022942",
   "message_id": "1572763938964119673",
   "proposed_at": "2026-11-19T00:01:22Z",
-  "compil": true
+  "compil": true,
+  "flash_fait_es": true
  },
  "PlacidSavageWhalePeteZarollTie-5N9nyxfNvNmdViGJ": {
   "id": "PlacidSavageWhalePeteZarollTie-5N9nyxfNvNmdViGJ",
@@ -3532,7 +3535,8 @@
   "status": "propose",
   "channel": "1572689952393666580",
   "message_id": "1572869443615195189",
-  "proposed_at": "2026-11-19T07:01:21Z"
+  "proposed_at": "2026-11-19T07:01:21Z",
+  "flash_fait_fr": true
  },
  "KathishFlirtySheepVoHiYo-IUEJPfQRbR75w61M": {
   "id": "KathishFlirtySheepVoHiYo-IUEJPfQRbR75w61M",
@@ -3614,7 +3618,8 @@
   "channel": "1572689984186753136",
   "message_id": "1572869511957188609",
   "proposed_at": "2026-11-19T07:01:21Z",
-  "auto_ecarte": "pas du gameplay GTA (Le streamer parle face caméra sur un écran de menu de GTA VI (Build 930.048.020, options New Game/Load Game), sans jeu réellement en cours ; les images floues ne montrent aucune action marquante, et le propos n'est pas compréhensible sans le son.)"
+  "auto_ecarte": "pas du gameplay GTA (Le streamer parle face caméra sur un écran de menu de GTA VI (Build 930.048.020, options New Game/Load Game), sans jeu réellement en cours ; les images floues ne montrent aucune action marquante, et le propos n'est pas compréhensible sans le son.)",
+  "flash_fait_en": true
  },
  "SuperSlickStrawberryAMPEnergy-iLijF7374bmMsbtk": {
   "id": "SuperSlickStrawberryAMPEnergy-iLijF7374bmMsbtk",
@@ -4583,7 +4588,8 @@
   "channel": "1572689952393666580",
   "message_id": "1572960009728565349",
   "proposed_at": "2026-11-19T13:01:19Z",
-  "auto_ecarte": "pas assez drôle/intéressant : 6/10 (XababTV conduit un quad sur une piste de sable dans GTA, le véhicule finit par se renverser, puis il court à pied et se fait poursuivre par un personnage, avec une réaction surprise à l'écran. Le clip est assez court et amusant, sans être très intense.)"
+  "auto_ecarte": "pas assez drôle/intéressant : 6/10 (XababTV conduit un quad sur une piste de sable dans GTA, le véhicule finit par se renverser, puis il court à pied et se fait poursuivre par un personnage, avec une réaction surprise à l'écran. Le clip est assez court et amusant, sans être très intense.)",
+  "flash_fait_fr": true
  },
  "QuaintTawdryAnteaterTinyFace-gRdPVlC22SQvj3XM": {
   "id": "QuaintTawdryAnteaterTinyFace-gRdPVlC22SQvj3XM",
@@ -6498,7 +6504,8 @@
   "channel": "1572689952393666580",
   "message_id": "1573095879861084344",
   "proposed_at": "2026-11-19T22:01:13Z",
-  "auto_ecarte": "pas assez drôle/intéressant : 6/10 (Le streamer chowh1 joue à GTA : il traîne un énorme alligator mort, le laisse en tas au sol, puis l'enflamme avec un bidon d'essence. Ensuite un écran rouge « MORT » apparaît et il réagit face caméra. Action absurde et drôle, sans contenu problématique.)"
+  "auto_ecarte": "pas assez drôle/intéressant : 6/10 (Le streamer chowh1 joue à GTA : il traîne un énorme alligator mort, le laisse en tas au sol, puis l'enflamme avec un bidon d'essence. Ensuite un écran rouge « MORT » apparaît et il réagit face caméra. Action absurde et drôle, sans contenu problématique.)",
+  "flash_fait_fr": true
  },
  "TallHappyInternRickroll-v__ZDPb8tPGDhc-9": {
   "id": "TallHappyInternRickroll-v__ZDPb8tPGDhc-9",
@@ -7362,7 +7369,8 @@
   "channel": "1572694526538022942",
   "message_id": "1573126242385789026",
   "proposed_at": "2026-11-20T00:01:16Z",
-  "compil": true
+  "compil": true,
+  "flash_fait_es": true
  },
  "SuperOilyTeaRickroll-PvI5IXJB_Z1ycM7P": {
   "id": "SuperOilyTeaRickroll-PvI5IXJB_Z1ycM7P",
@@ -7875,7 +7883,8 @@
   "channel": "1572689984186753136",
   "message_id": "1573171435407540285",
   "proposed_at": "2026-11-20T03:01:11Z",
-  "auto_ecarte": "pas assez drôle/intéressant : 4/10 (Le clip montre un personnage en sweat à capuche avec un sac de sport rose qui court dans une ville, puis fuit des policiers au coucher du soleil. On voit la mention 'Book it' et 'Lose the cops', donc il s'agit d'une course-poursuite dans GTA. Action modérée, rien de vraiment spectaculaire ni de réaction forte, et le contexte reste peu clair sans le son.)"
+  "auto_ecarte": "pas assez drôle/intéressant : 4/10 (Le clip montre un personnage en sweat à capuche avec un sac de sport rose qui court dans une ville, puis fuit des policiers au coucher du soleil. On voit la mention 'Book it' et 'Lose the cops', donc il s'agit d'une course-poursuite dans GTA. Action modérée, rien de vraiment spectaculaire ni de réaction forte, et le contexte reste peu clair sans le son.)",
+  "flash_fait_en": true
  },
  "EphemeralIgnorantGoldfishDxCat-sfG4h5fuvLLv04HP": {
   "id": "EphemeralIgnorantGoldfishDxCat-sfG4h5fuvLLv04HP",
