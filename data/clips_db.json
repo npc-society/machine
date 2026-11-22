@@ -962,7 +962,8 @@
   "message_id": "1572716443324256438",
   "proposed_at": "2026-11-18T20:52:56Z",
   "compil": true,
-  "flash_fait_es": true
+  "flash_fait_es": true,
+  "compil_fait_es": true
  },
  "PunchyInexpensiveTildeMau5-7StLAtUvj20MEXyC": {
   "id": "PunchyInexpensiveTildeMau5-7StLAtUvj20MEXyC",
@@ -1077,7 +1078,8 @@
   "message_id": "1572726902966194349",
   "proposed_at": "2026-11-18T21:34:51Z",
   "compil": true,
-  "flash_fait_en": true
+  "flash_fait_en": true,
+  "compil_fait_en": true
  },
  "IgnorantAlertWeaselCmonBruh-25JH2deNGiQMf6Ew": {
   "id": "IgnorantAlertWeaselCmonBruh-25JH2deNGiQMf6Ew",
@@ -1268,7 +1270,8 @@
   "channel": "1572694526538022942",
   "message_id": "1572727057543073874",
   "proposed_at": "2026-11-18T21:34:51Z",
-  "compil": true
+  "compil": true,
+  "compil_fait_es": true
  },
  "OptimisticSwissSwanPupper-HT6sE6K5lTzLX9q8": {
   "id": "OptimisticSwissSwanPupper-HT6sE6K5lTzLX9q8",
@@ -1950,7 +1953,8 @@
   "channel": "1572689984186753136",
   "message_id": "1572763841878823083",
   "proposed_at": "2026-11-19T00:01:22Z",
-  "compil": true
+  "compil": true,
+  "compil_fait_en": true
  },
  "TsundereSmoggyRaccoonPermaSmug-zUq7va1zP5OLv98f": {
   "id": "TsundereSmoggyRaccoonPermaSmug-zUq7va1zP5OLv98f",
@@ -2077,7 +2081,8 @@
   "message_id": "1572763938964119673",
   "proposed_at": "2026-11-19T00:01:22Z",
   "compil": true,
-  "flash_fait_es": true
+  "flash_fait_es": true,
+  "compil_fait_es": true
  },
  "PlacidSavageWhalePeteZarollTie-5N9nyxfNvNmdViGJ": {
   "id": "PlacidSavageWhalePeteZarollTie-5N9nyxfNvNmdViGJ",
@@ -2098,7 +2103,8 @@
   "channel": "1572694526538022942",
   "message_id": "1572763953870676074",
   "proposed_at": "2026-11-19T00:01:22Z",
-  "compil": true
+  "compil": true,
+  "compil_fait_es": true
  },
  "SparklyEnchantingKimchiRuleFive-nFwdyisMgC_RJtiB": {
   "id": "SparklyEnchantingKimchiRuleFive-nFwdyisMgC_RJtiB",
@@ -2738,7 +2744,8 @@
   "channel": "1572689984186753136",
   "message_id": "1572809045113307337",
   "proposed_at": "2026-11-19T03:01:11Z",
-  "compil": true
+  "compil": true,
+  "compil_fait_en": true
  },
  "ZanyTangibleMelonRiPepperonis-PazCjZFUrS2aCjDO": {
   "id": "ZanyTangibleMelonRiPepperonis-PazCjZFUrS2aCjDO",
@@ -4756,7 +4763,8 @@
   "channel": "1572689984186753136",
   "message_id": "1572960127789830186",
   "proposed_at": "2026-11-19T13:01:19Z",
-  "compil": true
+  "compil": true,
+  "compil_fait_en": true
  },
  "ShyLazyWebRlyTho-dzidOnr5j7HOogbt": {
   "id": "ShyLazyWebRlyTho-dzidOnr5j7HOogbt",
@@ -5374,7 +5382,8 @@
   "channel": "1572689984186753136",
   "message_id": "1573020492380766260",
   "proposed_at": "2026-11-19T17:01:20Z",
-  "compil": true
+  "compil": true,
+  "compil_fait_en": true
  },
  "BlindingGleamingDonkeyOpieOP-LMiLWd2l1xgmvbEM": {
   "id": "BlindingGleamingDonkeyOpieOP-LMiLWd2l1xgmvbEM",
@@ -5395,7 +5404,8 @@
   "channel": "1572689984186753136",
   "message_id": "1573020508092498061",
   "proposed_at": "2026-11-19T17:01:20Z",
-  "compil": true
+  "compil": true,
+  "compil_fait_en": true
  },
  "FitSpineyMouseLitty-1bp_UyIKqBwASbDd": {
   "id": "FitSpineyMouseLitty-1bp_UyIKqBwASbDd",
@@ -6716,7 +6726,8 @@
   "channel": "1572689984186753136",
   "message_id": "1573096031791616031",
   "proposed_at": "2026-11-19T22:01:13Z",
-  "compil": true
+  "compil": true,
+  "compil_fait_en": true
  },
  "ObservantSquareJaguarBCouch-YF5zxyCF92SdRE4H": {
   "id": "ObservantSquareJaguarBCouch-YF5zxyCF92SdRE4H",
@@ -6839,7 +6850,8 @@
   "channel": "1572694526538022942",
   "message_id": "1573096121255989380",
   "proposed_at": "2026-11-19T22:01:13Z",
-  "compil": true
+  "compil": true,
+  "compil_fait_es": true
  },
  "ElegantTentativeRingNotLikeThis-rOsc6xxhypfWvOXe": {
   "id": "ElegantTentativeRingNotLikeThis-rOsc6xxhypfWvOXe",
@@ -7378,7 +7390,8 @@
   "message_id": "1573126242385789026",
   "proposed_at": "2026-11-20T00:01:16Z",
   "compil": true,
-  "flash_fait_es": true
+  "flash_fait_es": true,
+  "compil_fait_es": true
  },
  "SuperOilyTeaRickroll-PvI5IXJB_Z1ycM7P": {
   "id": "SuperOilyTeaRickroll-PvI5IXJB_Z1ycM7P",
@@ -7933,7 +7946,8 @@
   "channel": "1572689984186753136",
   "message_id": "1573171466113912834",
   "proposed_at": "2026-11-20T03:01:11Z",
-  "compil": true
+  "compil": true,
+  "compil_fait_en": true
  },
  "InterestingTenderAntDatBoi-EZDrmI2P6yRqS_l7": {
   "id": "InterestingTenderAntDatBoi-EZDrmI2P6yRqS_l7",
@@ -10739,7 +10753,8 @@
   "message_id": "1573458353122844713",
   "proposed_at": "2026-11-20T22:01:11Z",
   "compil": true,
-  "flash_fait_en": true
+  "flash_fait_en": true,
+  "compil_fait_en": true
  },
  "SoftIncredulousNightingalePJSugar-P-lIq58jUV36GSxH": {
   "id": "SoftIncredulousNightingalePJSugar-P-lIq58jUV36GSxH",
@@ -10824,7 +10839,8 @@
   "message_id": "1573458414804144211",
   "proposed_at": "2026-11-20T22:01:11Z",
   "compil": true,
-  "flash_fait_es": true
+  "flash_fait_es": true,
+  "compil_fait_es": true
  },
  "SincereHardCrowOpieOP-SrNvi8XWw4y88Hlw": {
   "id": "SincereHardCrowOpieOP-SrNvi8XWw4y88Hlw",
@@ -11237,7 +11253,8 @@
   "message_id": "1573488520360755301",
   "proposed_at": "2026-11-21T00:01:11Z",
   "compil": true,
-  "flash_fait_en": true
+  "flash_fait_en": true,
+  "compil_fait_en": true
  },
  "SmilingAliveWerewolfFutureMan-10rXQu8L6XNDpXW2": {
   "id": "SmilingAliveWerewolfFutureMan-10rXQu8L6XNDpXW2",
@@ -16005,5 +16022,26 @@
   "message_id": "1574092476904505447",
   "proposed_at": "2026-11-22T16:01:11Z",
   "auto_ecarte": "pas assez drôle/intéressant : 6/10 (Le clip montre un personnage dans GTA qui réagit à une voiture en feu avec une mission qui échoue (« wasted », « mission failed »). La streameuse réagit fortement face caméra, avec des images rouges et du chaos, mais le moment reste assez court et sans son clair.)"
+ },
+ "CautiousInventiveLarkNinjaGrumpy-1HrIkx98YBO1uMQU": {
+  "id": "CautiousInventiveLarkNinjaGrumpy-1HrIkx98YBO1uMQU",
+  "lang": "en",
+  "title": "LUCIA SHOWER 😍",
+  "url": "https://www.twitch.tv/icanthearyouhah/clip/CautiousInventiveLarkNinjaGrumpy-1HrIkx98YBO1uMQU",
+  "created_at": "2026-11-22T15:19:11Z",
+  "streamer": "icanthearyouhah",
+  "streamer_id": "482160618",
+  "tier": "petit",
+  "viewers": null,
+  "views": 36,
+  "duration": 30,
+  "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/cc705943-9196-4e5e-a668-679fc86f0d62/landscape/thumb/thumb-0000000000-480x272.jpg",
+  "game": "Grand Theft Auto VI",
+  "category": "drole",
+  "status": "propose",
+  "channel": "1572689984186753136",
+  "message_id": "1574107532136554597",
+  "proposed_at": "2026-11-22T17:01:12Z",
+  "auto_ecarte": "nudité sur 78 % du clip"
  }
 }
