@@ -15566,5 +15566,49 @@
   "message_id": "1573971676658532513",
   "proposed_at": "2026-11-22T08:01:09Z",
   "auto_ecarte": "pas assez drôle/intéressant : 5/10 (Le clip montre le jeu GTA avec le personnage dans un salon de coiffure qui interagit avec une PNJ, avec une réaction surprise de la streameuse en incrustation ; l'action est assez floue mais comporte une situation absurde et un ton de chaos léger.)"
+ },
+ "ImpartialSeductiveOrangeEleGiggle-UMDD_bE-Q7q3rN3X": {
+  "id": "ImpartialSeductiveOrangeEleGiggle-UMDD_bE-Q7q3rN3X",
+  "lang": "en",
+  "title": "Reggie folds",
+  "url": "https://www.twitch.tv/woolieversus/clip/ImpartialSeductiveOrangeEleGiggle-UMDD_bE-Q7q3rN3X",
+  "created_at": "2026-11-22T08:09:56Z",
+  "streamer": "WoolieVersus",
+  "streamer_id": "142132586",
+  "tier": "moyen",
+  "viewers": 783,
+  "views": 311,
+  "duration": 60,
+  "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/d9be0fbd-b280-40f5-8a89-1012ef372f0b/landscape/thumb/thumb-0000000000-480x272.jpg",
+  "game": "Grand Theft Auto VI",
+  "category": "drole",
+  "status": "propose",
+  "channel": "1572689984186753136",
+  "message_id": "1573986719907324026",
+  "proposed_at": "2026-11-22T09:01:07Z",
+  "auto_ecarte": "pas assez drôle/intéressant : 3/10 (Le clip montre le jeu GTA au début (un personnage suit Mandy dans un couloir de maison de nuit, avec dialogue sur un évier et la cuisine), puis le streamer ouvre le menu pause et reste bloqué sur l'écran Chapitre 1 « Pipework » pendant la majorité du clip. Aucune action forte ni chaos visible, et le titre « Reggie folds » n'est pas illustré par les images, donc peu d'intérêt pour un scroll.)"
+ },
+ "SaltySmellyTardigradeSSSsss-5t2QCAxjoy3Xcp0g": {
+  "id": "SaltySmellyTardigradeSSSsss-5t2QCAxjoy3Xcp0g",
+  "lang": "en",
+  "title": "WTF",
+  "url": "https://www.twitch.tv/adrianbillings/clip/SaltySmellyTardigradeSSSsss-5t2QCAxjoy3Xcp0g",
+  "created_at": "2026-11-22T05:04:44Z",
+  "streamer": "adrianbillings",
+  "streamer_id": "522909320",
+  "tier": "petit",
+  "viewers": null,
+  "views": 29,
+  "duration": 26,
+  "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/3c066e93-6c7c-4b0b-bb9a-b58234fc9e39/landscape/thumb/thumb-0000000000-480x272.jpg",
+  "game": "Grand Theft Auto VI",
+  "category": "incroyable",
+  "status": "propose",
+  "channel": "1572689984186753136",
+  "message_id": "1573986736822812763",
+  "proposed_at": "2026-11-22T09:01:07Z",
+  "rendered": [
+   "en"
+  ]
  }
 }
