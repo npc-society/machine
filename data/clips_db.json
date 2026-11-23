@@ -18160,5 +18160,26 @@
   "message_id": "1574454848789811275",
   "proposed_at": "2026-11-23T16:01:12Z",
   "auto_ecarte": "pas assez drôle/intéressant : 3/10 (Le clip montre une streameuse en webcam qui commente, suivie d'un passage de jeu GTA (personnage tué, puis exploration d'une route et d'une plage). Il ne se passe pas grand-chose de marquant, et les sous-titres comme le texte de chat sont peu lisibles, donc le contexte est difficile à saisir sans le son.)"
+ },
+ "SleepyMoistSowPRChase-tI0uC0B4OrD_OuC0": {
+  "id": "SleepyMoistSowPRChase-tI0uC0B4OrD_OuC0",
+  "lang": "fr",
+  "title": "stunt michou",
+  "url": "https://www.twitch.tv/michou/clip/SleepyMoistSowPRChase-tI0uC0B4OrD_OuC0",
+  "created_at": "2026-11-23T11:10:10Z",
+  "streamer": "Michou",
+  "streamer_id": "231634715",
+  "tier": "gros",
+  "viewers": 25191,
+  "views": 185,
+  "duration": 30,
+  "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/836a9bd2-4b21-4eb8-a4a7-70d4d0aed926/landscape/thumb/thumb-0000000000-480x272.jpg",
+  "game": "Grand Theft Auto VI",
+  "category": "incroyable",
+  "status": "propose",
+  "channel": "1572689952393666580",
+  "message_id": "1574469961290883152",
+  "proposed_at": "2026-11-23T17:01:25Z",
+  "auto_ecarte": "pas assez drôle/intéressant : 6/10 (Le streamer conduit une Porsche cabriolet verte dans GTA sur une autoroute, puis la voiture part en tonneau et finit retournée dans l'herbe au bord de la route (images 4 et 5). Le clip est court et sans son clair, mais la cascade ratée donne un moment visuel amusant.)"
  }
 }
