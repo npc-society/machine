@@ -19965,5 +19965,26 @@
   "message_id": "1574817298382983262",
   "proposed_at": "2026-11-24T16:01:12Z",
   "compil": true
+ },
+ "RelatedExpensiveEelBleedPurple-EER18eheN5qmhA_W": {
+  "id": "RelatedExpensiveEelBleedPurple-EER18eheN5qmhA_W",
+  "lang": "en",
+  "title": "traffic",
+  "url": "https://www.twitch.tv/caseoh_/clip/RelatedExpensiveEelBleedPurple-EER18eheN5qmhA_W",
+  "created_at": "2026-11-24T14:34:35Z",
+  "streamer": "caseoh_",
+  "streamer_id": "267160288",
+  "tier": "gros",
+  "viewers": 106123,
+  "views": 240,
+  "duration": 60,
+  "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/65e611db-0b09-46fd-a6eb-1601dd738f4a/landscape/thumb/thumb-0000000000-480x272.jpg",
+  "game": "Grand Theft Auto VI",
+  "category": "drole",
+  "status": "propose",
+  "channel": "1572689984186753136",
+  "message_id": "1574832361441460306",
+  "proposed_at": "2026-11-24T17:01:21Z",
+  "auto_ecarte": "pas assez drôle/intéressant : 5/10 (Gameplay GTA visible : un camion malaxeur roule sur une autoroute en ville, un chat en direct montre le streamer et son chat, mais le clip est court, sans son clair et l'action reste limitée. Un échec de mission (le patient n'arrive pas à l'hôpital) apparaît à la fin, ce qui donne une petite chute drôle.)"
  }
 }
