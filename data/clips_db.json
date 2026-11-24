@@ -19755,5 +19755,28 @@
   "message_id": "1574756810794082456",
   "proposed_at": "2026-11-24T12:01:10Z",
   "auto_ecarte": "pas assez drôle/intéressant : 5/10 (Gameplay GTA clair : un personnage debout au bord de la route, un pick-up vert abîmé qui roule sans roues avant puis se fait remorquer par un camion-grue, le tout sous le titre « Uber is here ». Le clip est amusant mais l'action reste modeste, sans chaos majeur ni réaction forte.)"
+ },
+ "HelplessExuberantBottleWOOP-ztLikYjmKwdOH4ZR": {
+  "id": "HelplessExuberantBottleWOOP-ztLikYjmKwdOH4ZR",
+  "lang": "en",
+  "title": "w tbone",
+  "url": "https://www.twitch.tv/stiner/clip/HelplessExuberantBottleWOOP-ztLikYjmKwdOH4ZR",
+  "created_at": "2026-11-24T07:05:55Z",
+  "streamer": "Stiner",
+  "streamer_id": "216738488",
+  "tier": "petit",
+  "viewers": 291,
+  "views": 26,
+  "duration": 36.1,
+  "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/0de8cf18-05f6-42c2-92e9-245d1d2bd801/landscape/thumb/thumb-0000000000-480x272.jpg",
+  "game": "Grand Theft Auto VI",
+  "category": "drole",
+  "status": "propose",
+  "channel": "1572689984186753136",
+  "message_id": "1574771907084157031",
+  "proposed_at": "2026-11-24T13:01:14Z",
+  "rendered": [
+   "en"
+  ]
  }
 }
