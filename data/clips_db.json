@@ -22607,5 +22607,49 @@
   "message_id": "1575365488358203576",
   "proposed_at": "2026-11-26T04:19:44Z",
   "auto_ecarte": "pas assez drôle/intéressant : 5/10 (Gameplay GTA 6 montrant un personnage féminin qui marche sur une route, croise une voiture blanche, puis un homme en chemise hawaïenne. Un dialogue (sous-titré en espagnol) et une interaction de contact (main tenue) se déroulent, sans action spectaculaire ni chaos marqué. Le clip reste léger et assez banal, avec un ton de discussion et de mise en scène relationnelle plutôt que de vraie prise de risque.)"
+ },
+ "AlluringBlazingRamenSpicyBoy-sko6V1PulX738lmG": {
+  "id": "AlluringBlazingRamenSpicyBoy-sko6V1PulX738lmG",
+  "lang": "en",
+  "title": "WE GOT AWAY DONNIE",
+  "url": "https://www.twitch.tv/jjboomin3/clip/AlluringBlazingRamenSpicyBoy-sko6V1PulX738lmG",
+  "created_at": "2026-11-26T00:53:10Z",
+  "streamer": "jjboomin3",
+  "streamer_id": "856507333",
+  "tier": "petit",
+  "viewers": 39,
+  "views": 36,
+  "duration": 30,
+  "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/1e1d2656-9348-45c7-a35e-776143bf8943/landscape/thumb/thumb-0000000000-480x272.jpg",
+  "game": "Grand Theft Auto VI",
+  "category": "drole",
+  "status": "propose",
+  "channel": "1572689984186753136",
+  "message_id": "1575375873971060797",
+  "proposed_at": "2026-11-26T05:01:10Z",
+  "rendered": [
+   "en"
+  ]
+ },
+ "BumblingNimbleBoarSwiftRage-PrcHte4lvk26wReh": {
+  "id": "BumblingNimbleBoarSwiftRage-PrcHte4lvk26wReh",
+  "lang": "en",
+  "title": "florida cops",
+  "url": "https://www.twitch.tv/katerino/clip/BumblingNimbleBoarSwiftRage-PrcHte4lvk26wReh",
+  "created_at": "2026-11-26T00:02:20Z",
+  "streamer": "Katerino",
+  "streamer_id": "101038124",
+  "tier": "petit",
+  "viewers": 76,
+  "views": 29,
+  "duration": 30,
+  "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/c235c067-d22c-478d-9aa8-38473d0640af/landscape/thumb/thumb-0000000000-480x272.jpg",
+  "game": "Grand Theft Auto VI",
+  "category": "course",
+  "status": "propose",
+  "channel": "1572689984186753136",
+  "message_id": "1575375891951910973",
+  "proposed_at": "2026-11-26T05:01:10Z",
+  "auto_ecarte": "pas assez drôle/intéressant : 4/10 (Gameplay GTA: le joueur conduit un pick-up rouge dans un parking, croise des voitures de police et la conversation du streamer suggère une situation de police qui tourne mal (\"cop MPC gets\", \"gave up\"), mais l'action reste assez calme et peu spectaculaire.)"
  }
 }
