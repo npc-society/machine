@@ -25448,5 +25448,49 @@
   "message_id": "1576115796956938291",
   "proposed_at": "2026-11-28T06:01:10Z",
   "auto_ecarte": "pas assez drôle/intéressant : 6/10 (Le clip montre une scène de jeu GTA avec un personnage en rouge qui maltraite une femme dans une maison, sur fond de réaction du streamer en incrustation. Il se passe une action marquée et le ton est théâtral, mais la scène est sombre et ne contient pas de contenu sexuel explicite ni de nudité ; le contenu de violence fictive dans le jeu reste cadré.)"
+ },
+ "AwkwardDoubtfulLEDPartyTime-UmPJB8k-AkJSBhIq": {
+  "id": "AwkwardDoubtfulLEDPartyTime-UmPJB8k-AkJSBhIq",
+  "lang": "en",
+  "title": "💪Становая 138 Кг! x8 305 Lbs DeadLift!",
+  "url": "https://www.twitch.tv/sacura_ogawa/clip/AwkwardDoubtfulLEDPartyTime-UmPJB8k-AkJSBhIq",
+  "created_at": "2026-11-28T06:02:07Z",
+  "streamer": "sacura_ogawa",
+  "streamer_id": "548904275",
+  "tier": "petit",
+  "viewers": 30,
+  "views": 26,
+  "duration": 40,
+  "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/956fd7e1-f45b-4826-8981-0499e8e67ab7/landscape/thumb/thumb-0000000000-480x272.jpg",
+  "game": "Grand Theft Auto VI",
+  "category": "drole",
+  "status": "propose",
+  "channel": "1572689984186753136",
+  "message_id": "1576130856219844619",
+  "proposed_at": "2026-11-28T07:01:09Z",
+  "auto_ecarte": "pas assez drôle/intéressant : 4/10 (Le streamer soulève une barre dans GTA sous les yeux d'une webcam, avec des répétitions comptées à l'écran ; l'action est répétitive, sans chaos ni exploit, et le titre seul (138 kg) est l'élément le plus notable.)"
+ },
+ "HeadstrongFastBeanTBCheesePull-ELgpAUEt0hRNa5eX": {
+  "id": "HeadstrongFastBeanTBCheesePull-ELgpAUEt0hRNa5eX",
+  "lang": "en",
+  "title": "🐍Свободу Долорес! Free Dolores!",
+  "url": "https://www.twitch.tv/sacura_ogawa/clip/HeadstrongFastBeanTBCheesePull-ELgpAUEt0hRNa5eX",
+  "created_at": "2026-11-28T03:18:28Z",
+  "streamer": "sacura_ogawa",
+  "streamer_id": "548904275",
+  "tier": "petit",
+  "viewers": 30,
+  "views": 25,
+  "duration": 16.3,
+  "thumbnail": "https://static-cdn.jtvnw.net/twitch-video-assets/twitch-vap-video-assets-prod-us-west-2/0fd4dd20-2d9e-4cc3-8c48-b76be8a54ffb/landscape/thumb/thumb-0000000000-480x272.jpg",
+  "game": "Grand Theft Auto VI",
+  "category": "drole",
+  "status": "propose",
+  "channel": "1572689984186753136",
+  "message_id": "1576130870182674553",
+  "proposed_at": "2026-11-28T07:01:09Z",
+  "rendered": [
+   "en"
+  ]
  }
 }
